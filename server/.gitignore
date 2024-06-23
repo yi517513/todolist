@@ -1,0 +1,22 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+logs
+*.log
+
+# Ignore npm debug file
+npm-debug.log*
+
+# Ignore yarn lockfile
+yarn.lock
+
+# Ignore build output
+dist/
+build/
+
+# Ignore coverage directory
+coverage/
