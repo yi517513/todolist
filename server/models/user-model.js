@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const bcrypt = require("bcrypt");
+const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS);
 
 const userSchema = new Schema({
   username: {
@@ -18,7 +19,7 @@ const userSchema = new Schema({
   password: {
     type: String,
     required: true,
-    minlength: 8,
+    minlength: 6,
     maxlength: 20,
   },
 });
