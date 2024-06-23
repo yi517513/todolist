@@ -13,12 +13,13 @@ const userSchema = new Schema({
     type: String,
     required: true,
     minlength: 6,
-    maxlength: 50,
+    maxlength: 20,
   },
   password: {
     type: String,
     required: true,
     minlength: 8,
+    maxlength: 20,
   },
 });
 
