@@ -19,7 +19,7 @@ const loginValidation = (data) => {
 
 const todoValidation = (data) => {
   const Schema = Joi.object({
-    title: Joi.string().max(10).required(),
+    title: Joi.string().max(20).required(),
     description: Joi.string().max(50),
   });
   return Schema.validate(data);

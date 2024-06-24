@@ -6,6 +6,7 @@ const authRoute = require("./routes/auth");
 const todoRoute = require("./routes/todo");
 const passport = require("passport");
 require("./config/passport")(passport);
+const searchRoute = require("./routes/search");
 
 mongoose
   .connect("mongodb://localhost:27017/testDB")
@@ -26,6 +27,12 @@ app.use(
   "/api/todo",
   passport.authenticate("jwt", { session: false }),
   todoRoute
+);
+
+app.use(
+  "/api/search",
+  passport.authenticate("jwt", { session: false }),
+  searchRoute
 );
 
 app.listen(8080, () => {

@@ -7,7 +7,7 @@ const todoSchema = new Schema({
   title: {
     type: String,
     required: true,
-    maxlength: 10,
+    maxlength: 20,
   },
   description: {
     type: String,

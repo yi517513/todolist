@@ -5,8 +5,6 @@ const passwordValidation = require("../validation").passwordValidation;
 const passport = require("passport");
 const User = require("../models/user-model");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS);
 
 router.use("/", (req, res, next) => {
   console.log("正在接收跟auth有關的請求");
@@ -23,7 +21,7 @@ router.post("/register", async (req, res) => {
     return res.status(400).send(error.details[0].message);
 
   // 要註冊的email是否與資料庫內的重複
-  const emailExist = await User.findOne({ email });
+  const emailExist = await User.findOne({ email }).exec();
   if (emailExist) return res.status(400).send("此信箱已經被註冊過了。。");
 
   // 新增用戶
@@ -44,7 +42,7 @@ router.post("/login", async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   // 確認信箱是否正確
-  const foundUser = await User.findOne({ email });
+  const foundUser = await User.findOne({ email }).exec();
   if (!foundUser) {
     return res.status(401).send("無法找到使用者，請確認信箱是否正確。");
   }
@@ -72,7 +70,7 @@ router.patch(
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     let newPassword = req.body.password;
-    let foundUser = await User.findOne({ _id: req.user._id });
+    let foundUser = await User.findOne({ _id: req.user._id }).exec();
 
     // joi
     let { error } = passwordValidation({ password: newPassword });
@@ -94,14 +92,14 @@ router.patch(
   }
 );
 
-// 註銷用戶
+// 刪除帳號
 router.delete(
   "/delete",
   passport.authenticate("jwt", { session: false }),
   async (req, res) => {
     try {
-      await User.findByIdAndDelete({ _id: req.user._id });
-      return res.send("註銷帳號成功!");
+      await User.findByIdAndDelete({ _id: req.user._id }).exec();
+      return res.send("刪除帳號成功!");
     } catch (e) {
       res.status(500).send(e);
     }
