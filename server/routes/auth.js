@@ -4,9 +4,8 @@ const loginValidation = require("../validation").loginValidation;
 const User = require("../models/user-model");
 const jwt = require("jsonwebtoken");
 
-router.get("/", (req, res, next) => {
+router.use("/", (req, res, next) => {
   console.log("正在接收跟auth有關的請求");
-  res.send("伺服器已接收跟auth有關的請求");
   next();
 });
 
@@ -49,13 +48,12 @@ router.post("/login", async (req, res) => {
     if (err) return res.status(400).send(err);
     if (isMatch) {
       // 與DB中的密碼相符，驗證成功，製作JWT
-      const payload = { id: foundUser._id, email: foundUser.email };
-      const secretKey = process.env.SECRET;
-      const options = { expiresIn: "1h" }; // 設定過期時間
-      const token = jwt.sign(payload, secretKey, options);
+      const payload = { _id: foundUser._id, email: foundUser.email };
+      const token = jwt.sign(payload, process.env.SECRET);
       return res.send({
         message: "登入成功",
-        token: "JWT " + token,
+        token: "Bearer " + token,
+        user: foundUser,
       });
     } else {
       return res.status(401).send("密碼錯誤");

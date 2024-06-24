@@ -2,9 +2,12 @@ const router = require("express").Router();
 const Todo = require("../models/todo-model");
 
 router.use("/", (req, res, next) => {
-  console.log("正在接收跟todo有關的請求");
-  res.send("伺服器已接收跟todo有關的請求");
+  console.log("正在接收跟todo有關的請求(Authorized)");
   next();
+});
+
+router.get("/", (req, res) => {
+  return res.send("正在/todo route(Authorized)");
 });
 
 // 新增待辦事項
