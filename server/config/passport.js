@@ -3,7 +3,7 @@ let ExtractJwt = require("passport-jwt").ExtractJwt;
 const User = require("../models/user-model");
 
 let opts = {};
-// opts.jwtFromRequest指定從哪裡獲取JWT。這裡使用的是ExtractJwt.fromAuthHeaderWithScheme()，即從請求標頭中的jwt Token提取。
+// opts.jwtFromRequest指定從哪裡獲取JWT。這裡使用的是ExtractJwt.fromAuthHeaderAsBearerToken()，即從請求標頭中的Bearer Token提取。
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 opts.secretOrKey = process.env.SECRET;
 
@@ -14,9 +14,9 @@ module.exports = (passport) => {
       try {
         let foundUser = await User.findOne({ _id: jwt_payload._id }).exec();
         if (foundUser) {
+          // req.user = foundUser
           return done(null, foundUser);
         } else {
-          console.log("NofoundUser");
           return done(null, false);
         }
       } catch (e) {

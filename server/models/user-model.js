@@ -24,14 +24,12 @@ const userSchema = new Schema({
   },
 });
 
-// 驗證密碼
+// 驗證使用者輸入的密碼是否與資料庫的相同，兩個都是hash過的，更改成return promise
 userSchema.methods.comparePassword = async function (password, callback) {
-  let result;
   try {
-    result = await bcrypt.compare(password, this.password);
-    return callback(null, result);
+    return await bcrypt.compare(password, this.password);
   } catch (e) {
-    return callback(e, result);
+    throw new Error(e);
   }
 };
 
