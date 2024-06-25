@@ -15,7 +15,7 @@ const NavComponent1 = () => {
           <Link to="/login">Login</Link>
         </li>
         <li>
-          <Link to="/profie">Profile</Link>
+          <Link to="/profile">Profile</Link>
         </li>
         <li>
           <Link to="/logout">Logout</Link>

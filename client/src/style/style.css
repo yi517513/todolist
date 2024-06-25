@@ -14,7 +14,7 @@ a {
 }
 
 body {
-  background-color: #8bcffc;
+  background-color: #272727;
   color: white;
   font-family: "Baloo 2", cursive;
 }
@@ -85,4 +85,94 @@ main section button.addTodo {
   margin-top: 0.5rem;
   width: 2.5rem;
   border-radius: 1rem;
+}
+
+div.register {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 5rem;
+}
+div.register .input-group {
+  display: flex;
+  align-items: center;
+  margin: 1rem 0;
+}
+div.register .input-group input {
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  margin: 0.5rem;
+  font-size: 1.2rem;
+  color: black;
+  width: 30rem;
+  border-radius: 1rem;
+}
+div.register .input-group label {
+  text-align: right;
+  width: 8rem;
+  font-size: 1.5rem;
+  color: white;
+  margin-bottom: 0.5rem;
+  margin-right: 0.5rem;
+}
+div.register button {
+  font-size: 1.5rem;
+  border: none;
+  padding: 1rem;
+  margin-top: 2rem;
+  border-radius: 1rem;
+  cursor: pointer;
+}
+div.register button:hover {
+  color: yellow;
+}
+
+div.profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 3rem;
+}
+div.profile div.user-info,
+div.profile div.user-stats,
+div.profile div.account-settings {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 600px;
+}
+div.profile div.user-info h2,
+div.profile div.user-stats h2,
+div.profile div.account-settings h2 {
+  margin-bottom: 0.75rem;
+  font-size: 2rem;
+}
+div.profile div.user-info p,
+div.profile div.user-stats p,
+div.profile div.account-settings p {
+  margin: 0.5rem 0;
+  font-size: 1.5rem;
+}
+div.profile div.user-info button,
+div.profile div.user-stats button,
+div.profile div.account-settings button {
+  margin: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
+  background-color: white;
+  color: black;
+  border-radius: 1rem;
+  cursor: pointer;
+}
+div.profile div.user-info button:hover,
+div.profile div.user-stats button:hover,
+div.profile div.account-settings button:hover {
+  background-color: yellow;
+}
+div.profile div.account-settings {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }/*# sourceMappingURL=style.css.map */
