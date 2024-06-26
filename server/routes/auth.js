@@ -55,9 +55,7 @@ router.post("/login", async (req, res) => {
     const payload = { _id: foundUser._id, email: foundUser.email };
     const token = jwt.sign(payload, process.env.SECRET);
     return res.send({
-      message: "登入成功",
       token: "Bearer " + token,
-      user: foundUser,
     });
   } else {
     return res.status(401).send("密碼錯誤");
@@ -103,6 +101,16 @@ router.delete(
     } catch (e) {
       res.status(500).send(e);
     }
+  }
+);
+
+// 獲取當前用戶的資訊
+router.get(
+  "/current",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    let { username, email, date } = req.user;
+    return res.send({ username, email, date });
   }
 );
 

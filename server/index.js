@@ -7,6 +7,7 @@ const todoRoute = require("./routes/todo");
 const passport = require("passport");
 require("./config/passport")(passport);
 const searchRoute = require("./routes/search");
+const cors = require("cors");
 
 mongoose
   .connect("mongodb://localhost:27017/testDB")
@@ -19,6 +20,8 @@ mongoose
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(passport.initialize());
+app.use(cors());
 
 app.use("/api/user", authRoute);
 

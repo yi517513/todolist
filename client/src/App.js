@@ -6,8 +6,30 @@ import HomeComponent from "./components/home-component";
 import RegisterComponent from "./components/register-component";
 import LoginComponent from "./components/login-component";
 import ProfileComponent from "./components/profile-component";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { setUser } from "./slices/authSlice";
+import AuthService from "./services/auth.service";
 
 function App() {
+  const dispatch = useDispatch();
+
+  // 啟動時，檢查localstroage是否有token，若有就被添加到redux狀態中
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          const user = await AuthService.getCurrentUser(token);
+          dispatch(setUser({ user, token }));
+        } catch (error) {
+          console.error("Error fetching user:", error);
+        }
+      }
+    };
+    fetchUser();
+  }, [dispatch]);
+
   return (
     <BrowserRouter>
       <Routes>

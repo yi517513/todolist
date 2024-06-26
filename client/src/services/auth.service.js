@@ -2,9 +2,9 @@ import axios from "axios";
 const AUTH_API_URL = "http://localhost:8080/api/user";
 
 class AuthService {
-  register(user, email, password) {
+  register(username, email, password) {
     return axios.post(AUTH_API_URL + "/register", {
-      user,
+      username,
       email,
       password,
     });
@@ -12,6 +12,16 @@ class AuthService {
   login(email, password) {
     return axios.post(AUTH_API_URL + "/login", { email, password });
   }
+  getCurrentUser(token) {
+    return axios
+      .get(AUTH_API_URL + "/current", {
+        headers: {
+          Authorization: token,
+        },
+      })
+      .then((response) => response.data);
+  }
 }
 
-export default new AuthService();
+const authService = new AuthService();
+export default authService;

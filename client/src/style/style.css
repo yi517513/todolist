@@ -87,46 +87,6 @@ main section button.addTodo {
   border-radius: 1rem;
 }
 
-div.register {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 5rem;
-}
-div.register .input-group {
-  display: flex;
-  align-items: center;
-  margin: 1rem 0;
-}
-div.register .input-group input {
-  padding: 0.75rem;
-  border: 1px solid #ccc;
-  margin: 0.5rem;
-  font-size: 1.2rem;
-  color: black;
-  width: 30rem;
-  border-radius: 1rem;
-}
-div.register .input-group label {
-  text-align: right;
-  width: 8rem;
-  font-size: 1.5rem;
-  color: white;
-  margin-bottom: 0.5rem;
-  margin-right: 0.5rem;
-}
-div.register button {
-  font-size: 1.5rem;
-  border: none;
-  padding: 1rem;
-  margin-top: 2rem;
-  border-radius: 1rem;
-  cursor: pointer;
-}
-div.register button:hover {
-  color: yellow;
-}
-
 div.profile {
   display: flex;
   flex-direction: column;
@@ -175,4 +135,63 @@ div.profile div.account-settings {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+div.register_login {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 15rem;
+}
+div.register_login div.err_msg {
+  position: absolute;
+  top: -5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 10px;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  width: auto;
+  text-align: center;
+  border-radius: 10px;
+}
+div.register_login div.err_msg p {
+  margin: 0;
+  font-size: 1.5rem;
+}
+div.register_login div.input-group {
+  display: flex;
+  align-items: center;
+  margin: 1rem 0;
+}
+div.register_login div.input-group input {
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  margin: 0.5rem;
+  font-size: 1.2rem;
+  color: black;
+  width: 30rem;
+  border-radius: 1rem;
+}
+div.register_login div.input-group label {
+  text-align: right;
+  width: 8rem;
+  font-size: 1.5rem;
+  color: white;
+  margin-bottom: 0.5rem;
+  margin-right: 0.5rem;
+}
+div.register_login button {
+  font-size: 1.5rem;
+  border: none;
+  padding: 1rem;
+  margin-top: 2rem;
+  border-radius: 1rem;
+  cursor: pointer;
+}
+div.register_login button:hover {
+  color: yellow;
 }/*# sourceMappingURL=style.css.map */
