@@ -62,11 +62,25 @@ div.todo {
       border: none;
       border-radius: 5rem;
       cursor: pointer;
+
+      &.completed {
+        background-color: lightgreen;
+      }
+      &.failured {
+        background-color: lightcoral;
+      }
     }
     input {
       width: 50%;
       padding: 0.5rem 1rem;
     }
+  }
+
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+
+  &.fade-out {
+    opacity: 0;
+    transform: translateY(-20px);
   }
 }
 

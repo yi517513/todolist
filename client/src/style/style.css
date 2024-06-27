@@ -48,6 +48,9 @@ nav ul form input {
   cursor: pointer;
 }
 
+div.todo {
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
 div.todo form {
   min-width: 80vw;
   display: flex;
@@ -63,9 +66,21 @@ div.todo form button.todo {
   border-radius: 5rem;
   cursor: pointer;
 }
+div.todo form input.completed,
+div.todo form button.todo.completed {
+  background-color: lightgreen;
+}
+div.todo form input.failured,
+div.todo form button.todo.failured {
+  background-color: lightcoral;
+}
 div.todo form input {
   width: 50%;
   padding: 0.5rem 1rem;
+}
+div.todo.fade-out {
+  opacity: 0;
+  transform: translateY(-20px);
 }
 
 main section {

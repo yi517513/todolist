@@ -7,8 +7,8 @@ const LoginComponent = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   let [account, setAccount] = useState({
-    email: "test123@gmail.com",
-    password: "test123",
+    email: "teacher@gmail.com",
+    password: "teacher",
   });
   let [error, setError] = useState(null);
 
