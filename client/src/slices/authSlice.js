@@ -1,13 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import AuthService from "../services/auth.service";
 
-const token = localStorage.getItem("token");
+// const token = localStorage.getItem("token");
 // 定義初始狀態
 const initialState = {
   user: null,
   isLoading: false,
-  isAuthenticated: !!token,
+  isAuthenticated: false,
   error: null,
+  token: localStorage.getItem("token") || null,
 };
 
 // 定義非同步操作
@@ -39,6 +40,26 @@ export const login = createAsyncThunk(
   }
 );
 
+export const verifyToken = createAsyncThunk(
+  "auth/verifyToken",
+  async (_, thunkAPI) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return thunkAPI.rejectWithValue("No token found");
+    }
+    try {
+      const response = await AuthService.verifytoken(token);
+      if (response.data.success) {
+        const userResponse = await AuthService.getCurrentUser(token);
+        return userResponse.data;
+      }
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue("Invalid token");
+    }
+  }
+);
+
 // 創建 slice
 // 在extraReducers中處理createAsyncThunk生成的action types，以管理異步操作的不同狀態（pending, fulfilled, rejected）
 const authSlice = createSlice({
@@ -49,6 +70,7 @@ const authSlice = createSlice({
       state.user = null;
       state.isAuthenticated = false;
       state.error = null;
+      state.token = null;
       localStorage.removeItem("token");
     },
     setUser(state, action) {
@@ -77,13 +99,29 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = action.payload;
+        state.token = action.payload.token;
         state.isAuthenticated = true;
         localStorage.setItem("token", action.payload.token);
       })
       .addCase(login.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+      })
+      .addCase(verifyToken.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(verifyToken.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload;
+        state.isAuthenticated = true;
+      })
+      .addCase(verifyToken.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isAuthenticated = false;
+        state.error = action.payload;
+        state.token = null;
+        localStorage.removeItem("token");
       });
   },
 });

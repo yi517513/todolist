@@ -91,7 +91,7 @@ div.profile {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 3rem;
+  margin-top: 2rem;
 }
 div.profile div.user-info,
 div.profile div.user-stats,
@@ -114,6 +114,54 @@ div.profile div.user-stats p,
 div.profile div.account-settings p {
   margin: 0.5rem 0;
   font-size: 1.5rem;
+}
+div.profile div.user-info div.change-password,
+div.profile div.user-stats div.change-password,
+div.profile div.account-settings div.change-password {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+div.profile div.user-info div.change-password div.err_msg,
+div.profile div.user-stats div.change-password div.err_msg,
+div.profile div.account-settings div.change-password div.err_msg {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 1px;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  width: 100%;
+  text-align: center;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+div.profile div.user-info div.change-password div.err_msg p,
+div.profile div.user-stats div.change-password div.err_msg p,
+div.profile div.account-settings div.change-password div.err_msg p {
+  margin: 0;
+  font-size: 1.4rem;
+}
+div.profile div.user-info div.change-password div.change-item,
+div.profile div.user-stats div.change-password div.change-item,
+div.profile div.account-settings div.change-password div.change-item {
+  display: flex;
+}
+div.profile div.user-info div.change-password div.change-item label,
+div.profile div.user-stats div.change-password div.change-item label,
+div.profile div.account-settings div.change-password div.change-item label {
+  align-content: center;
+  margin: 0rem 0.5rem;
+  font-size: 1.2rem;
+}
+div.profile div.user-info div.change-password div.change-item input,
+div.profile div.user-stats div.change-password div.change-item input,
+div.profile div.account-settings div.change-password div.change-item input {
+  font-size: 1rem;
+  margin-top: 0rem 0.5rem;
+  padding: 0rem 1rem;
+  border-radius: 1rem;
 }
 div.profile div.user-info button,
 div.profile div.user-stats button,

@@ -106,11 +106,21 @@ router.delete(
 
 // 獲取當前用戶的資訊
 router.get(
-  "/current",
+  "/getCurrentUser",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    let { username, email, date } = req.user;
-    return res.send({ username, email, date });
+    // 返回的資訊去掉密碼，因為是通過passport取得mongoose的資料所以要+._doc
+    const { password, ...userWithoutPassword } = req.user._doc;
+    return res.send(userWithoutPassword);
+  }
+);
+
+// 驗證token
+router.get(
+  "/verifytoken",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    return res.json({ success: true });
   }
 );
 

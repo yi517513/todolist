@@ -7,24 +7,36 @@ const RegisterComponent = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  let [username, setUsername] = useState("");
-  let [email, setEmail] = useState("");
-  let [password, setPassword] = useState("");
+  let [account, setAccount] = useState({
+    username: " ",
+    email: " ",
+    password: " ",
+  });
   let [error, setError] = useState(null);
 
   const handleUsername = (e) => {
-    setUsername(e.target.value);
+    setAccount((prevAccount) => ({
+      ...prevAccount,
+      username: e.target.value,
+    }));
   };
   const handleEmail = (e) => {
-    setEmail(e.target.value);
+    setAccount((prevAccount) => ({ ...prevAccount, email: e.target.value }));
   };
   const handlePassword = (e) => {
-    setPassword(e.target.value);
+    setAccount((prevAccount) => ({
+      ...prevAccount,
+      password: e.target.value,
+    }));
   };
   const handleRegister = async () => {
     try {
       const resultAction = await dispatch(
-        register({ username, email, password })
+        register({
+          username: account.username,
+          email: account.email,
+          password: account.password,
+        })
       );
       if (register.fulfilled.match(resultAction)) {
         window.alert("註冊成功，您現在將被重新導向到登入頁面");

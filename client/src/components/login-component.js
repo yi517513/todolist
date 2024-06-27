@@ -6,20 +6,24 @@ import { useNavigate } from "react-router-dom";
 const LoginComponent = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  let [email, setEmail] = useState("");
-  let [password, setPassword] = useState("");
+  let [account, setAccount] = useState({
+    email: "test123@gmail.com",
+    password: "test123",
+  });
   let [error, setError] = useState(null);
 
   const handleEmail = (e) => {
-    setEmail(e.target.value);
+    setAccount((prevAccount) => ({ ...prevAccount, email: e.target.value }));
   };
+
   const handlePassword = (e) => {
-    setPassword(e.target.value);
+    setAccount((prevAccount) => ({ ...prevAccount, password: e.target.value }));
   };
   const handleLogin = async () => {
     try {
-      const resultAction = await dispatch(login({ email, password }));
+      const resultAction = await dispatch(
+        login({ email: account.email, password: account.password })
+      );
       if (login.fulfilled.match(resultAction)) {
         window.alert("登入成功，您現在將被重新導向到首頁");
         navigate("/");
@@ -40,11 +44,15 @@ const LoginComponent = () => {
       )}
       <div className="input-group">
         <label>Email :</label>
-        <input name="email" onChange={handleEmail} />
+        <input name="email" value={account.email} onChange={handleEmail} />
       </div>
       <div className="input-group">
         <label>Password :</label>
-        <input name="password" onChange={handlePassword} />
+        <input
+          name="password"
+          value={account.password}
+          onChange={handlePassword}
+        />
       </div>
       <button onClick={handleLogin}>Login</button>
     </div>

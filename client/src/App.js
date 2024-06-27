@@ -17,11 +17,11 @@ function App() {
   // 啟動時，檢查localstroage是否有token，若有就被添加到redux狀態中
   useEffect(() => {
     const fetchUser = async () => {
-      const token = localStorage.getItem("token");
-      if (token) {
+      const tokenFromStorage = localStorage.getItem("token");
+      if (tokenFromStorage) {
         try {
-          const user = await AuthService.getCurrentUser(token);
-          dispatch(setUser({ user, token }));
+          const user = await AuthService.getCurrentUser(tokenFromStorage);
+          dispatch(setUser({ user, token: tokenFromStorage }));
         } catch (error) {
           console.error("Error fetching user:", error);
         }
