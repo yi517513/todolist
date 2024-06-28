@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setUser } from "./slices/authSlice";
 import AuthService from "./services/auth.service";
+import { setTodo } from "./slices/todoSlice";
 
 function App() {
   const dispatch = useDispatch();
@@ -27,7 +28,19 @@ function App() {
         }
       }
     };
+
+    const fetchTodo = () => {
+      // Object.keys適用於獲取物件中所有可枚舉屬性名的方法
+      // 在這context中Object.keys(localStorage)是為了獲取localStorage中所有存儲的key
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith("todo_")) {
+          const todo = JSON.parse(localStorage.getItem(key));
+          dispatch(setTodo(todo));
+        }
+      });
+    };
     fetchUser();
+    fetchTodo();
   }, [dispatch]);
 
   return (

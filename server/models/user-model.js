@@ -14,6 +14,7 @@ const userSchema = new Schema({
   email: {
     type: String,
     required: true,
+    unique: true, // 確保email唯一
     minlength: 6,
     maxlength: 20,
   },
@@ -25,6 +26,7 @@ const userSchema = new Schema({
   },
   date: {
     type: String,
+    default: () => moment().tz("Asia/Taipei").format("YYYY-MM-DD"),
   },
 });
 
@@ -44,13 +46,6 @@ userSchema.pre("save", async function (next) {
       const hashValue = await bcrypt.hash(this.password, SALT_ROUNDS);
       this.password = hashValue;
     }
-
-    if (!this.date) {
-      this.date = moment().format("YYYY-MM-DD");
-    } else {
-      this.date = moment(this.date).format("YYYY-MM-DD");
-    }
-
     next();
   } catch (e) {
     next(e);

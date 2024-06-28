@@ -1,4 +1,5 @@
 const Joi = require("joi");
+Joi.objectId = require("joi-objectid")(Joi);
 
 const registerValidation = (data) => {
   const Schema = Joi.object({
@@ -17,10 +18,20 @@ const loginValidation = (data) => {
   return Schema.validate(data);
 };
 
-const todoValidation = (data) => {
+const addTodoValidation = (data) => {
   const Schema = Joi.object({
-    title: Joi.string().max(20).required(),
-    description: Joi.string().max(50),
+    check: Joi.boolean().required(),
+    id: Joi.string().required(),
+    text: Joi.string().max(50).required(),
+    userID: Joi.objectId().required(),
+  });
+  return Schema.validate(data);
+};
+
+const editTodoValidation = (data) => {
+  const Schema = Joi.object({
+    check: Joi.boolean().required(),
+    text: Joi.string().max(50).required(),
   });
   return Schema.validate(data);
 };
@@ -34,5 +45,6 @@ const passwordValidation = (data) => {
 
 module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
-module.exports.todoValidation = todoValidation;
+module.exports.addTodoValidation = addTodoValidation;
+module.exports.editTodoValidation = editTodoValidation;
 module.exports.passwordValidation = passwordValidation;

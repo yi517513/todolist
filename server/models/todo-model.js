@@ -1,34 +1,30 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const moment = require("moment-timezone");
-const { func } = require("joi");
 
 const todoSchema = new Schema({
-  title: {
-    type: String,
+  check: {
+    type: Boolean,
     required: true,
-    maxlength: 20,
   },
-  description: {
+  text: {
     type: String,
     maxlength: 50,
+    required: true,
+  },
+  id: {
+    type: String,
+    required: true,
+  },
+  userID: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
   },
   date: {
     type: String,
+    default: () => moment().tz("Asia/Taipei").format("YYYY-MM-DD"),
   },
-  date_: {
-    type: Date,
-    default: Date.now,
-  },
-});
-
-todoSchema.pre("save", function (next) {
-  if (!this.date) {
-    this.date = moment().format("YYYY-MM-DD");
-  } else {
-    this.date = moment(this.date).format("YYYY-MM-DD");
-  }
-  next();
 });
 
 module.exports = mongoose.model("Todo", todoSchema);

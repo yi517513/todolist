@@ -21,6 +21,7 @@ body {
 
 nav {
   box-shadow: 0 8px 6px -6px black;
+  caret-color: transparent;
 }
 nav ul {
   display: flex;
@@ -48,9 +49,6 @@ nav ul form input {
   cursor: pointer;
 }
 
-div.todo {
-  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-}
 div.todo form {
   min-width: 80vw;
   display: flex;
@@ -74,13 +72,17 @@ div.todo form input.failured,
 div.todo form button.todo.failured {
   background-color: lightcoral;
 }
+div.todo form input.restrict {
+  background-color: lightblue;
+  pointer-events: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  caret-color: transparent;
+}
 div.todo form input {
   width: 50%;
   padding: 0.5rem 1rem;
-}
-div.todo.fade-out {
-  opacity: 0;
-  transform: translateY(-20px);
 }
 
 main section {
@@ -88,6 +90,7 @@ main section {
   flex-direction: column;
   align-items: center;
   margin-top: 4rem;
+  caret-color: transparent;
 }
 main section h1 {
   font-size: 4rem;

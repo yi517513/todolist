@@ -1,36 +1,51 @@
 import React, { useState } from "react";
 import TodoComponent from "./todo-component";
-import { v4 as uuidv4 } from "uuid";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addTodo,
+  deleteTodo,
+  editTodo,
+  saveTodo,
+  checkTodo,
+} from "../slices/todoSlice";
 
 const HomeComponent = () => {
-  // 確保每個todo列都有一個唯一的ID，即便刪除了中間列，也能保證React
-  // 正確的重新渲染和排列其他列
-  const [todos, setTodos] = useState([{ id: uuidv4() }]);
+  const dispatch = useDispatch();
+  const todos = useSelector((state) => state.todos);
+  const { token } = useSelector((state) => state.auth);
+  const { _id } = useSelector((state) => state.auth);
 
-  const addTodo = () => {
-    setTodos([...todos, { id: uuidv4() }]);
-  };
-
-  const deleteTodo = (idToRemove) => {
-    // 不等於indexToRemove的todo會被留下來
-    setTodos(todos.filter((todo) => todo.id !== idToRemove));
+  const handleAddTodo = () => {
+    dispatch(addTodo());
   };
 
   return (
     <main>
       <section>
         <h1>Todo-List</h1>
-        {todos.map((todo, index) => {
+        {Object.values(todos).map((todo) => {
           return (
             <TodoComponent
               key={todo.id}
-              id={todo.id}
-              index={index}
-              deleteTodo={deleteTodo}
+              todo={todo}
+              deleteTodo={() => dispatch(deleteTodo(todo.id))}
+              editTodo={() => dispatch(editTodo(todo.id))}
+              saveTodo={(text) =>
+                dispatch(
+                  saveTodo({
+                    id: todo.id,
+                    text,
+                    check: todo.check,
+                    token,
+                    userID: _id,
+                  })
+                )
+              }
+              checkTodo={() => dispatch(checkTodo(todo.id))}
             />
           );
         })}
-        <button className="addTodo" onClick={addTodo}>
+        <button className="addTodo" onClick={handleAddTodo}>
           +
         </button>
       </section>

@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const Todo = require("../models/todo-model");
 const todoValidation = require("../validation").todoValidation;
+const editTodoValidation = require("../validation").editTodoValidation;
 
 router.use("/", (req, res, next) => {
   console.log("正在接收跟todo有關的請求(Authorized)");
@@ -17,49 +18,69 @@ router.get("/", async (req, res) => {
   }
 });
 
-// 新增待辦事項
-router.post("/", async (req, res) => {
-  let { title, description } = req.body;
-  // Joi驗證
-  let { error, value } = todoValidation({ title, description });
-  if (error) return res.status(400).send(error.details);
-  // 新增資料
+// 查詢特定id待辦事項
+router.get("/:_id", async (req, res) => {
+  let { _id } = req.params;
   try {
-    let newTodo = new Todo({ title, description });
-    await newTodo.save();
-    return res.send("成功新增資料!");
+    let foundTodo = await Todo.findOne({ id: _id }).exec();
+    return res.send(foundTodo);
   } catch (e) {
-    return res.status(400).send("新增失敗");
+    return res.status(400).send(e);
   }
 });
 
-// 修改待辦事項
-router.patch("/:_id", async (req, res) => {
-  let { title, description } = req.body;
-  let { _id } = req.params;
+// 查詢成功or失敗待辦事項
+router.get("/check/:check", async (req, res) => {
+  let { check } = req.params;
+  check = check === true || check === "true";
   try {
-    let foundTodo = await Todo.findOne({ _id }).exec();
-    if (!foundTodo) {
-      return res.status(404).send("不存在待辦事項");
-    }
-    let { error } = todoValidation({ title, description });
-    if (error) return res.status(400).send(error.details[0].message);
+    let foundTodo = await Todo.find({ check }).exec();
+    return res.send(foundTodo);
+  } catch (e) {
+    return res.status(400).send(e);
+  }
+});
 
+// 新增待辦事項
+router.post("/", async (req, res) => {
+  let { text, id, check, userID } = req.body;
+  check = check === "true" || check === true;
+
+  // Joi驗證
+  let { error } = todoValidation({ text, id, check, userID });
+  if (error) return res.status(400).send(error.details);
+  // 新增資料
+  try {
+    let newTodo = new Todo({ text, id, check, userID });
+    await newTodo.save();
+    return res.send("成功新增資料!");
+  } catch (e) {
+    return res.status(400).send("新增失敗" + e);
+  }
+});
+
+// 修改待辦事項 - todo的id作為params，通過jwt保護req.user.id就是userID
+router.patch("/:id", async (req, res) => {
+  let { text, check } = req.body;
+  let { id } = req.params;
+  try {
+    let foundTodo = await Todo.findOne({ id, userID: req.user.id }).exec();
+    if (!foundTodo || check != ("true" || "false")) {
+      return res.status(500).send("發生未知錯誤。。。");
+    }
+    let { error } = editTodoValidation({ text, check });
+    if (error) return res.status(400).send(error.details[0].message);
     //檢查是否有被修改
-    if (title && title !== foundTodo.title) {
-      foundTodo.title = title;
+    if (text !== foundTodo.text || check !== toString(foundTodo.check)) {
+      foundTodo.text = text;
+      foundTodo.check = check;
+
+      if (foundTodo.isModified("text")) {
+        await foundTodo.save();
+        return res.send("修改事項成功!");
+      }
     }
-    if (description && description !== foundTodo.description) {
-      foundTodo.description = description;
-    }
-    let isModified =
-      foundTodo.isModified("title") || foundTodo.isModified("description");
-    if (isModified) {
-      await foundTodo.save();
-      return res.send("修改事項成功!");
-    } else {
-      return res.send("沒有修改事項!");
-    }
+    return res.send("沒有修改事項!");
   } catch (e) {
     return res.status(500).send(e);
   }

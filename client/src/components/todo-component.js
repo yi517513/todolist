@@ -1,91 +1,72 @@
 import React, { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCheck,
+  faTrashCan,
+  faPenToSquare,
+  faFloppyDisk,
+} from "@fortawesome/free-solid-svg-icons";
 
-const TodoComponent = ({ id, index, deleteTodo }) => {
-  const [todo, setTodo] = useState("");
-  const [input, setInput] = useState("");
-  const [isEditing, setIsEditing] = useState(false);
-  const [completed, setCompleted] = useState(false);
-  const [failured, setFailured] = useState(false);
-  const [isDelete, setIsDelete] = useState(false);
-
-  const handleInput = (e) => {
-    setInput(e.target.value);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      e.stopPropagation();
-      if (isEditing) {
-        setTodo(input);
-        // 按下enter後將資料鎖定。直到點擊edit
-        setIsEditing(false);
-      }
-    }
-  };
-
-  const handleAdd = () => {
-    setTodo(input);
-    setIsEditing(true);
-  };
-
-  const handleEdit = () => {
-    setIsEditing(false);
-  };
+const TodoComponent = ({ todo, deleteTodo, editTodo, saveTodo, checkTodo }) => {
+  const [text, setText] = useState(todo.text);
+  const { isEditing, check } = todo;
 
   const handleSave = (e) => {
-    setTodo(input);
-    setIsEditing(true);
-  };
-
-  const handleSubmit = (e) => {
     e.preventDefault();
+    saveTodo(text);
   };
 
-  const handleDelete = (e) => {
+  const handleEdit = (e) => {
     e.preventDefault();
-    deleteTodo(id);
-    setIsDelete(true);
-  };
-
-  const handleComplete = () => {
-    setCompleted(true);
-    setFailured(false);
-  };
-
-  const handleFailed = () => {
-    setFailured(true);
-    setCompleted(false);
+    editTodo(todo.id);
+    console.log(todo.isEditing);
   };
 
   return (
-    <div className={`todo ${isDelete ? "fade-out" : ""}`}>
-      <form onSubmit={handleSubmit}>
+    <div className="todo">
+      <form>
         <input
-          className={completed ? "completed" : failured ? "failured" : ""}
-          placeholder={index}
-          onChange={handleInput}
-          onKeyDown={handleKeyDown}
-          readOnly={isEditing}
+          className={!isEditing ? "restrict" : ""}
+          value={text}
+          onChange={(e) => {
+            e.preventDefault();
+            setText(e.target.value);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleSave(e);
+            }
+          }}
+          readOnly={!isEditing}
         />
-        {/* 根據是否有todo決定功能 truthy:Edit / falthy:Add */}
-        <button
-          className="todo"
-          onClick={!todo ? handleAdd : isEditing ? handleEdit : handleSave}
-        >
-          {!todo ? "Add" : isEditing ? "Edit" : "Save"}
+        <button className="todo" onClick={handleEdit}>
+          <FontAwesomeIcon icon={faPenToSquare} />
         </button>
-
-        <button
-          className="todo"
-          onClick={completed ? handleFailed : handleComplete}
-        >
-          O
+        <button className="todo" onClick={handleSave}>
+          <FontAwesomeIcon icon={faFloppyDisk} />
         </button>
-
-        <button className="todo" onClick={handleDelete}>
-          Delete
-        </button>
+        {check ? (
+          <button
+            className="todo"
+            onClick={(e) => {
+              e.preventDefault();
+              deleteTodo(todo.id);
+            }}
+          >
+            <FontAwesomeIcon icon={faTrashCan} />
+          </button>
+        ) : (
+          <button
+            className="todo"
+            onClick={(e) => {
+              e.preventDefault();
+              checkTodo(todo.id);
+            }}
+          >
+            <FontAwesomeIcon icon={faCheck} />
+          </button>
+        )}
       </form>
     </div>
   );
