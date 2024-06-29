@@ -7,26 +7,69 @@ import {
   faFloppyDisk,
 } from "@fortawesome/free-solid-svg-icons";
 
-const TodoComponent = ({ todo, deleteTodo, editTodo, saveTodo, checkTodo }) => {
+const TodoComponent = ({
+  todo,
+  deleteTodo,
+  toggleEditingTodo,
+  saveTodo,
+  updateTodo,
+}) => {
   const [text, setText] = useState(todo.text);
-  const { isEditing, check } = todo;
+  const [isUpdate, setIsUpdate] = useState(false);
+  const { isEditing, check, isLocal } = todo;
+  const [isEmptyClick, setIsEmptyClick] = useState(false);
 
   const handleSave = (e) => {
     e.preventDefault();
-    saveTodo(text);
+    // 阻擋不合理的請求
+    if (!text) {
+      setIsEmptyClick(true);
+      return;
+    }
+    if (isLocal && !isUpdate) {
+      saveTodo(text, false);
+      setIsUpdate(true);
+    } else if (isLocal && isUpdate) {
+      updateTodo(text, false, todo.id);
+    } else {
+      updateTodo(text, false, todo.id);
+    }
   };
 
-  const handleEdit = (e) => {
+  const handleCheck = (e) => {
     e.preventDefault();
-    editTodo(todo.id);
-    console.log(todo.isEditing);
+
+    if (!text) {
+      setIsEmptyClick(true);
+      return;
+    }
+    if (isLocal && !isUpdate) {
+      saveTodo(text, true);
+      setIsUpdate(true);
+    } else if (isLocal && isUpdate) {
+      updateTodo(text, true, todo.id);
+    } else {
+      updateTodo(text, true, todo.id);
+    }
   };
 
   return (
     <div className="todo">
       <form>
+        {/* className is 
+        !text && isEmptyClick = shake 
+        input&check = green, 
+        input&!isEditing = blue  */}
         <input
-          className={!isEditing ? "restrict" : ""}
+          className={
+            isEmptyClick
+              ? "shake"
+              : check
+              ? "check"
+              : !isEditing
+              ? "restrict"
+              : ""
+          }
           value={text}
           onChange={(e) => {
             e.preventDefault();
@@ -40,7 +83,14 @@ const TodoComponent = ({ todo, deleteTodo, editTodo, saveTodo, checkTodo }) => {
           }}
           readOnly={!isEditing}
         />
-        <button className="todo" onClick={handleEdit}>
+        <button
+          className="todo"
+          onClick={(e) => {
+            e.preventDefault();
+            toggleEditingTodo(todo.id);
+            setIsEmptyClick(false);
+          }}
+        >
           <FontAwesomeIcon icon={faPenToSquare} />
         </button>
         <button className="todo" onClick={handleSave}>
@@ -57,13 +107,7 @@ const TodoComponent = ({ todo, deleteTodo, editTodo, saveTodo, checkTodo }) => {
             <FontAwesomeIcon icon={faTrashCan} />
           </button>
         ) : (
-          <button
-            className="todo"
-            onClick={(e) => {
-              e.preventDefault();
-              checkTodo(todo.id);
-            }}
-          >
+          <button className="todo" onClick={handleCheck}>
             <FontAwesomeIcon icon={faCheck} />
           </button>
         )}

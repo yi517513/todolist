@@ -18,20 +18,24 @@ const loginValidation = (data) => {
   return Schema.validate(data);
 };
 
-const addTodoValidation = (data) => {
+const newTodoValidation = (data) => {
   const Schema = Joi.object({
     check: Joi.boolean().required(),
     id: Joi.string().required(),
     text: Joi.string().max(50).required(),
     userID: Joi.objectId().required(),
+    updateDate: Joi.number().required(),
   });
   return Schema.validate(data);
 };
 
-const editTodoValidation = (data) => {
+const updateTodoValidation = (data) => {
   const Schema = Joi.object({
     check: Joi.boolean().required(),
+    id: Joi.string().required(),
     text: Joi.string().max(50).required(),
+    userID: Joi.objectId().required(),
+    updateDate: Joi.number().required(),
   });
   return Schema.validate(data);
 };
@@ -45,6 +49,6 @@ const passwordValidation = (data) => {
 
 module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
-module.exports.addTodoValidation = addTodoValidation;
-module.exports.editTodoValidation = editTodoValidation;
+module.exports.newTodoValidation = newTodoValidation;
+module.exports.updateTodoValidation = updateTodoValidation;
 module.exports.passwordValidation = passwordValidation;

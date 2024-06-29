@@ -1,33 +1,79 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { gernerateTime } from "../services/date.service";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import TodoService from "../services/todo.service";
-
-const initialState = {};
+import { gernerateTime } from "../services/date.service";
 
 // 將saveTodo改寫成createAsyncThunk
+export const saveTodo = createAsyncThunk(
+  "todo/save",
+  async ({ text, check, userID, id, token }, thunkAPI) => {
+    const updateDate = gernerateTime();
+    try {
+      const response = await TodoService.saveTodo(
+        text,
+        check,
+        userID,
+        id,
+        token,
+        updateDate
+      );
+      return { message: response.data, updateDate };
+    } catch (error) {
+      //error.response.data-如果error.response不存在，則會拋出TypeError
+      //error.response?.data-使用可選鏈運算符，如果error.response不存在，返回undefined
+      const errorMessage = error.response?.data || error.message;
+      return thunkAPI.rejectWithValue(errorMessage);
+    }
+  }
+);
 // edit createAsyncThunk
-// check ?
+export const updateTodo = createAsyncThunk(
+  "todo/update",
+  async ({ text, check, userID, id, token }, thunkAPI) => {
+    const updateDate = gernerateTime();
+    try {
+      const response = await TodoService.updateTodo(
+        text,
+        check,
+        userID,
+        id,
+        token,
+        updateDate
+      );
+      return { message: response.data, updateDate };
+    } catch (error) {
+      const errorMessage = error.response?.data || error.message;
+      return thunkAPI.rejectWithValue(errorMessage);
+    }
+  }
+);
+
+// delete createAsyncThunk
 
 const todoSlice = createSlice({
   name: "todos",
-  initialState,
+  initialState: {},
   reducers: {
+    newTodo: (state) => {
+      const id = gernerateTime();
+      state[id] = {
+        id,
+        text: "",
+        isEditing: true,
+        check: false,
+        isLoading: false,
+        error: null,
+        updateDate: null,
+        isLocal: true,
+      };
+    },
     setTodo(state, action) {
-      const { id, text, check } = action.payload;
+      const { id, text, check, updateDate } = action.payload;
       state[id] = {
         id,
         text,
         isEditing: false,
         check,
-      };
-    },
-    addTodo: (state, action) => {
-      const id = gernerateTime();
-      state[id] = {
-        id,
-        text: action.payload || "",
-        isEditing: true,
-        check: false,
+        updateDate,
       };
     },
     deleteTodo: (state, action) => {
@@ -36,45 +82,82 @@ const todoSlice = createSlice({
       delete state[id];
       localStorage.removeItem(`todo_${id}`);
     },
-    editTodo: (state, action) => {
+    toggleEditingTodo: (state, action) => {
       const todo = state[action.payload];
       if (todo) {
         todo.isEditing = true;
       }
     },
-    saveTodo: async (state, action) => {
-      const { id, text, check, token, userID } = action.payload;
-      console.log(id, text, check, token, userID);
-      const todo = state[id];
-      if (todo) {
-        todo.text = text;
-        todo.isEditing = false;
-        localStorage.setItem(`todo_${id}`, JSON.stringify(todo));
-        try {
-          const addResult = await TodoService({
-            id,
-            text,
-            check,
-            token,
-            userID,
-          });
-          console.log(addResult);
-        } catch (e) {
-          console.log(e);
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(saveTodo.pending, (state, action) => {
+        // payload只有在非同步成功才能獲取到，它包含的是操作返回的結果
+        // action.meta.arg表示傳遞給非同步的初始參數，任何狀態下都可使用
+        const { id, text, check } = action.meta.arg;
+        state[id].text = text;
+        state[id].isEditing = false;
+        state[id].isLoading = false;
+        state[id].error = null;
+        state[id].check = check;
+        state[id].updateDate = Number(action.payload.updateDate);
+        if (check) {
+          state[id].isEditing = null;
         }
-      }
-    },
-    checkTodo: (state, action) => {
-      const id = action.payload;
-      const todo = state[id];
-      if (todo) {
-        todo.check = true;
-        localStorage.setItem(`todo_${id}`, JSON.stringify(todo));
-      }
-    },
+        localStorage.setItem(`todo_${id}`, JSON.stringify(state[id]));
+      })
+      .addCase(saveTodo.fulfilled, (state, action) => {
+        const { id, text, check } = action.meta.arg;
+        state[id].text = text;
+        state[id].isEditing = false;
+        state[id].isLoading = false;
+        state[id].error = null;
+        state[id].check = check;
+        state[id].updateDate = Number(action.payload.updateDate);
+        if (check) {
+          state[id].isEditing = null;
+        }
+        localStorage.setItem(`todo_${id}`, JSON.stringify(state[id]));
+      })
+      .addCase(saveTodo.rejected, (state, action) => {
+        const { id } = action.meta.arg;
+        state[id].isLoading = false;
+        state[id].error = action.payload;
+      })
+      .addCase(updateTodo.pending, (state, action) => {
+        const { id, check, text } = action.meta.arg;
+        state[id].isEditing = false;
+        state[id].isLoading = false;
+        state[id].error = null;
+        state[id].check = check;
+        state[id].text = text;
+        state[id].updateDate = Number(action.payload.updateDate);
+        if (check) {
+          state[id].isEditing = null;
+        }
+        localStorage.setItem(`todo_${id}`, JSON.stringify(state[id]));
+      })
+      .addCase(updateTodo.fulfilled, (state, action) => {
+        const { id, check, text } = action.meta.arg;
+        state[id].isEditing = false;
+        state[id].isLoading = false;
+        state[id].error = null;
+        state[id].check = check;
+        state[id].text = text;
+        state[id].updateDate = Number(action.payload.updateDate);
+        if (check) {
+          state[id].isEditing = null;
+        }
+        localStorage.setItem(`todo_${id}`, JSON.stringify(state[id]));
+      })
+      .addCase(updateTodo.rejected, (state, action) => {
+        const { id } = action.meta.arg;
+        state[id].isLoading = false;
+        state[id].error = action.payload;
+      });
   },
 });
 
-export const { setTodo, addTodo, deleteTodo, editTodo, saveTodo, checkTodo } =
+export const { setTodo, newTodo, deleteTodo, toggleEditingTodo } =
   todoSlice.actions;
 export default todoSlice.reducer;

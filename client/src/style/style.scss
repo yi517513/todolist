@@ -77,6 +77,19 @@ div.todo {
       user-select: none;
       caret-color: transparent;
     }
+    input.check {
+      background-color: lightgreen;
+      pointer-events: none;
+      user-select: none;
+      caret-color: transparent;
+    }
+    input.shake {
+      // background-color: black;
+      animation: shake 0.5s ease-in-out;
+      pointer-events: none;
+      user-select: none;
+      caret-color: transparent;
+    }
     input {
       width: 50%;
       padding: 0.5rem 1rem;
@@ -90,9 +103,9 @@ main {
     flex-direction: column;
     align-items: center;
     margin-top: 4rem;
-    caret-color: transparent;
     h1 {
       font-size: 4rem;
+      caret-color: transparent;
     }
 
     button.addTodo {
@@ -249,5 +262,23 @@ div.register_login {
     &:hover {
       color: yellow;
     }
+  }
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-20px);
+  }
+  50% {
+    transform: translateX(20px);
+  }
+  75% {
+    transform: translateX(-20px);
+  }
+  100% {
+    transform: translateX(0);
   }
 }

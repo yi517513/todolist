@@ -80,6 +80,22 @@ div.todo form input.restrict {
           user-select: none;
   caret-color: transparent;
 }
+div.todo form input.check {
+  background-color: lightgreen;
+  pointer-events: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  caret-color: transparent;
+}
+div.todo form input.shake {
+  animation: shake 0.5s ease-in-out;
+  pointer-events: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  caret-color: transparent;
+}
 div.todo form input {
   width: 50%;
   padding: 0.5rem 1rem;
@@ -90,10 +106,10 @@ main section {
   flex-direction: column;
   align-items: center;
   margin-top: 4rem;
-  caret-color: transparent;
 }
 main section h1 {
   font-size: 4rem;
+  caret-color: transparent;
 }
 main section button.addTodo {
   background-color: white;
@@ -260,4 +276,22 @@ div.register_login button {
 }
 div.register_login button:hover {
   color: yellow;
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-20px);
+  }
+  50% {
+    transform: translateX(20px);
+  }
+  75% {
+    transform: translateX(-20px);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }/*# sourceMappingURL=style.css.map */
