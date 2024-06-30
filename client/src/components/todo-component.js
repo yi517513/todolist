@@ -16,7 +16,7 @@ const TodoComponent = ({
 }) => {
   const [text, setText] = useState(todo.text);
   const [isUpdate, setIsUpdate] = useState(false);
-  const { isEditing, check, isLocal } = todo;
+  const { todoID, isEditing, check, isLocal } = todo;
   const [isEmptyClick, setIsEmptyClick] = useState(false);
 
   const handleSave = (e) => {
@@ -27,12 +27,14 @@ const TodoComponent = ({
       return;
     }
     if (isLocal && !isUpdate) {
-      saveTodo(text, false);
+      saveTodo(todoID, text, false);
       setIsUpdate(true);
     } else if (isLocal && isUpdate) {
-      updateTodo(text, false, todo.id);
+      // console.log("handleSave");
+      updateTodo(todoID, text, false);
     } else {
-      updateTodo(text, false, todo.id);
+      // console.log("handleSave");
+      updateTodo(todoID, text, false);
     }
   };
 
@@ -43,14 +45,7 @@ const TodoComponent = ({
       setIsEmptyClick(true);
       return;
     }
-    if (isLocal && !isUpdate) {
-      saveTodo(text, true);
-      setIsUpdate(true);
-    } else if (isLocal && isUpdate) {
-      updateTodo(text, true, todo.id);
-    } else {
-      updateTodo(text, true, todo.id);
-    }
+    updateTodo(todoID, text, true);
   };
 
   return (
@@ -87,21 +82,22 @@ const TodoComponent = ({
           className="todo"
           onClick={(e) => {
             e.preventDefault();
-            toggleEditingTodo(todo.id);
+            toggleEditingTodo(todoID);
             setIsEmptyClick(false);
           }}
         >
           <FontAwesomeIcon icon={faPenToSquare} />
         </button>
-        <button className="todo" onClick={handleSave}>
-          <FontAwesomeIcon icon={faFloppyDisk} />
-        </button>
-        {check ? (
+        {isEditing ? (
+          <button className="todo" onClick={handleSave}>
+            <FontAwesomeIcon icon={faFloppyDisk} />
+          </button>
+        ) : check ? (
           <button
             className="todo"
             onClick={(e) => {
               e.preventDefault();
-              deleteTodo(todo.id);
+              deleteTodo(todoID);
             }}
           >
             <FontAwesomeIcon icon={faTrashCan} />

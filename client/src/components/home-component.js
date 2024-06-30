@@ -19,9 +19,6 @@ const HomeComponent = () => {
     return <h1>Loading...</h1>;
   }
 
-  // 如果user存在，取得user的_id
-  const _id = user ? user._id : null;
-
   const handleAddTodo = () => {
     dispatch(newTodo());
   };
@@ -33,30 +30,24 @@ const HomeComponent = () => {
         {Object.values(todos).map((todo) => {
           return (
             <TodoComponent
-              key={todo.id}
+              key={todo.todoID}
               todo={todo}
-              deleteTodo={() => dispatch(deleteTodo(todo.id))}
-              toggleEditingTodo={() => dispatch(toggleEditingTodo(todo.id))}
-              saveTodo={(text, check) =>
+              deleteTodo={() => dispatch(deleteTodo(todo.todoID))}
+              toggleEditingTodo={() => dispatch(toggleEditingTodo(todo.todoID))}
+              saveTodo={(todoID, text, check) =>
                 dispatch(
                   saveTodo({
-                    id: todo.id,
+                    todoID,
                     text,
                     check,
-                    token,
-                    userID: _id,
                   })
                 )
               }
-              updateTodo={(text, check) =>
-                dispatch(
-                  updateTodo({ id: todo.id, text, check, token, userID: _id })
-                )
+              updateTodo={(todoID, text, check) =>
+                dispatch(updateTodo({ todoID, text, check }))
               }
-              checkTodo={(text, check) =>
-                dispatch(
-                  updateTodo({ id: todo.id, text, check, token, userID: _id })
-                )
+              checkTodo={(todoID, text, check) =>
+                dispatch(updateTodo({ todoID, text, check }))
               }
             />
           );

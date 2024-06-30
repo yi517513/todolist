@@ -5,22 +5,32 @@ import { gernerateTime } from "../services/date.service";
 // 將saveTodo改寫成createAsyncThunk
 export const saveTodo = createAsyncThunk(
   "todo/save",
-  async ({ text, check, userID, id, token }, thunkAPI) => {
+  async ({ todoID, text, check }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const { token } = state.auth || "";
+    const { _id: userID } = state.auth.user || "";
     const updateDate = gernerateTime();
+
+    const tempTodo = { ...state.todos[todoID], text, check, updateDate };
+    localStorage.setItem(`todo_${todoID}`, JSON.stringify(tempTodo));
+    if (!token && !userID)
+      return thunkAPI.rejectWithValue("No token or userID");
+
     try {
-      const response = await TodoService.saveTodo(
+      await TodoService.saveTodo(
         text,
         check,
         userID,
-        id,
+        todoID,
         token,
         updateDate
       );
-      return { message: response.data, updateDate };
+      return { todoID, text, check, updateDate };
     } catch (error) {
       //error.response.data-如果error.response不存在，則會拋出TypeError
       //error.response?.data-使用可選鏈運算符，如果error.response不存在，返回undefined
       const errorMessage = error.response?.data || error.message;
+      console.log(errorMessage);
       return thunkAPI.rejectWithValue(errorMessage);
     }
   }
@@ -28,18 +38,27 @@ export const saveTodo = createAsyncThunk(
 // edit createAsyncThunk
 export const updateTodo = createAsyncThunk(
   "todo/update",
-  async ({ text, check, userID, id, token }, thunkAPI) => {
+  async ({ todoID, text, check }, thunkAPI) => {
+    const state = thunkAPI.getState();
+    const { token } = state.auth;
+    const { _id: userID } = state.auth.user;
     const updateDate = gernerateTime();
+
+    const tempTodo = { ...state.todos[todoID], text, check, updateDate };
+    localStorage.setItem(`todo_${todoID}`, JSON.stringify(tempTodo));
+    if (!token && !userID)
+      return thunkAPI.rejectWithValue("No token or userID");
+
     try {
-      const response = await TodoService.updateTodo(
+      await TodoService.updateTodo(
         text,
         check,
         userID,
-        id,
+        todoID,
         token,
         updateDate
       );
-      return { message: response.data, updateDate };
+      return { todoID, text, check, updateDate };
     } catch (error) {
       const errorMessage = error.response?.data || error.message;
       return thunkAPI.rejectWithValue(errorMessage);
@@ -54,9 +73,9 @@ const todoSlice = createSlice({
   initialState: {},
   reducers: {
     newTodo: (state) => {
-      const id = gernerateTime();
-      state[id] = {
-        id,
+      const todoID = gernerateTime();
+      state[todoID] = {
+        todoID,
         text: "",
         isEditing: true,
         check: false,
@@ -67,9 +86,9 @@ const todoSlice = createSlice({
       };
     },
     setTodo(state, action) {
-      const { id, text, check, updateDate } = action.payload;
-      state[id] = {
-        id,
+      const { todoID, text, check, updateDate } = action.payload;
+      state[todoID] = {
+        todoID,
         text,
         isEditing: false,
         check,
@@ -77,10 +96,9 @@ const todoSlice = createSlice({
       };
     },
     deleteTodo: (state, action) => {
-      const id = action.payload;
-      console.log(id);
-      delete state[id];
-      localStorage.removeItem(`todo_${id}`);
+      const todoID = action.payload;
+      delete state[todoID];
+      localStorage.removeItem(`todo_${todoID}`);
     },
     toggleEditingTodo: (state, action) => {
       const todo = state[action.payload];
@@ -94,66 +112,46 @@ const todoSlice = createSlice({
       .addCase(saveTodo.pending, (state, action) => {
         // payload只有在非同步成功才能獲取到，它包含的是操作返回的結果
         // action.meta.arg表示傳遞給非同步的初始參數，任何狀態下都可使用
-        const { id, text, check } = action.meta.arg;
-        state[id].text = text;
-        state[id].isEditing = false;
-        state[id].isLoading = false;
-        state[id].error = null;
-        state[id].check = check;
-        state[id].updateDate = Number(action.payload.updateDate);
-        if (check) {
-          state[id].isEditing = null;
-        }
-        localStorage.setItem(`todo_${id}`, JSON.stringify(state[id]));
+        const { todoID } = action.meta.arg;
+        state[todoID].isLoading = false;
+        state[todoID].error = null;
       })
       .addCase(saveTodo.fulfilled, (state, action) => {
-        const { id, text, check } = action.meta.arg;
-        state[id].text = text;
-        state[id].isEditing = false;
-        state[id].isLoading = false;
-        state[id].error = null;
-        state[id].check = check;
-        state[id].updateDate = Number(action.payload.updateDate);
-        if (check) {
-          state[id].isEditing = null;
-        }
-        localStorage.setItem(`todo_${id}`, JSON.stringify(state[id]));
+        const { todoID, text, check, updateDate } = action.payload;
+        state[todoID].text = text;
+        state[todoID].isEditing = false;
+        state[todoID].isLoading = false;
+        state[todoID].error = null;
+        state[todoID].check = check;
+        state[todoID].isLocal = false;
+        state[todoID].updateDate = updateDate;
       })
       .addCase(saveTodo.rejected, (state, action) => {
-        const { id } = action.meta.arg;
-        state[id].isLoading = false;
-        state[id].error = action.payload;
+        const { todoID } = action.meta.arg;
+        state[todoID].isLoading = false;
+        state[todoID].error = action.payload;
       })
       .addCase(updateTodo.pending, (state, action) => {
-        const { id, check, text } = action.meta.arg;
-        state[id].isEditing = false;
-        state[id].isLoading = false;
-        state[id].error = null;
-        state[id].check = check;
-        state[id].text = text;
-        state[id].updateDate = Number(action.payload.updateDate);
-        if (check) {
-          state[id].isEditing = null;
-        }
-        localStorage.setItem(`todo_${id}`, JSON.stringify(state[id]));
+        const { todoID } = action.meta.arg;
+        state[todoID].isLoading = true;
+        state[todoID].error = null;
       })
       .addCase(updateTodo.fulfilled, (state, action) => {
-        const { id, check, text } = action.meta.arg;
-        state[id].isEditing = false;
-        state[id].isLoading = false;
-        state[id].error = null;
-        state[id].check = check;
-        state[id].text = text;
-        state[id].updateDate = Number(action.payload.updateDate);
+        const { todoID, text, check, updateDate } = action.payload;
+        state[todoID].isEditing = false;
+        state[todoID].isLoading = false;
+        state[todoID].error = null;
+        state[todoID].check = check;
+        state[todoID].text = text;
+        state[todoID].updateDate = updateDate;
         if (check) {
-          state[id].isEditing = null;
+          state[todoID].isEditing = null;
         }
-        localStorage.setItem(`todo_${id}`, JSON.stringify(state[id]));
       })
       .addCase(updateTodo.rejected, (state, action) => {
-        const { id } = action.meta.arg;
-        state[id].isLoading = false;
-        state[id].error = action.payload;
+        const { todoID } = action.meta.arg;
+        state[todoID].isLoading = false;
+        state[todoID].error = action.payload;
       });
   },
 });

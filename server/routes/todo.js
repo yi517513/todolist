@@ -44,15 +44,21 @@ router.get("/check/:check", async (req, res) => {
 
 // 新增待辦事項
 router.post("/", async (req, res) => {
-  let { text, id, check, userID, updateDate } = req.body;
+  let { text, todoID, check, userID, updateDate } = req.body;
   check = check === "true" || check === true;
 
   // Joi驗證
-  let { error } = newTodoValidation({ text, id, check, userID, updateDate });
+  let { error } = newTodoValidation({
+    text,
+    todoID,
+    check,
+    userID,
+    updateDate,
+  });
   if (error) return res.status(400).send(error.details);
   // 新增資料
   try {
-    let newTodo = new Todo({ text, id, check, userID, updateDate });
+    let newTodo = new Todo({ text, todoID, check, userID, updateDate });
     await newTodo.save();
     return res.send("成功新增資料!");
   } catch (e) {
@@ -60,19 +66,25 @@ router.post("/", async (req, res) => {
   }
 });
 
-// 修改待辦事項 - todo的id作為params，通過jwt保護req.user.id就是userID
-router.patch("/:id", async (req, res) => {
-  let { text, id, check, userID, updateDate } = req.body;
+// 更新待辦事項
+router.patch("/:todoID", async (req, res) => {
+  let { text, todoID, check, userID, updateDate } = req.body;
   check = check === "true" || check === true;
 
   // Joi驗證
-  let { error } = updateTodoValidation({ text, id, check, userID, updateDate });
+  let { error } = updateTodoValidation({
+    text,
+    todoID,
+    check,
+    userID,
+    updateDate,
+  });
   if (error) return res.status(400).send(error.details);
 
   // 更新資料
   try {
     let updatedTodo = await Todo.findOneAndUpdate(
-      { id: req.params.id },
+      { todoID: req.params.todoID },
       { text, check, userID, updateDate },
       { new: true }
     );

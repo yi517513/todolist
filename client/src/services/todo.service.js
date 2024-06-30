@@ -2,10 +2,10 @@ import axios from "axios";
 const TODO_URL = "http://localhost:8080/api/todo";
 
 class TodoService {
-  saveTodo(text, check, userID, id, token, updateDate) {
+  saveTodo(text, check, userID, todoID, token, updateDate) {
     return axios.post(
       TODO_URL,
-      { text, check, userID, id, updateDate },
+      { text, check, userID, todoID, updateDate },
       {
         headers: {
           Authorization: token,
@@ -13,11 +13,10 @@ class TodoService {
       }
     );
   }
-  updateTodo(text, check, userID, id, token, updateDate) {
-    console.log(text, check, userID, id, token, updateDate);
+  updateTodo(text, check, userID, todoID, token, updateDate) {
     return axios.patch(
-      TODO_URL + "/" + id,
-      { text, check, userID, id, updateDate },
+      TODO_URL + "/" + todoID,
+      { text, check, userID, todoID, updateDate },
       { headers: { Authorization: token } }
     );
   }

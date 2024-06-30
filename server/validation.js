@@ -21,7 +21,7 @@ const loginValidation = (data) => {
 const newTodoValidation = (data) => {
   const Schema = Joi.object({
     check: Joi.boolean().required(),
-    id: Joi.string().required(),
+    todoID: Joi.string().required(),
     text: Joi.string().max(50).required(),
     userID: Joi.objectId().required(),
     updateDate: Joi.number().required(),
@@ -32,7 +32,7 @@ const newTodoValidation = (data) => {
 const updateTodoValidation = (data) => {
   const Schema = Joi.object({
     check: Joi.boolean().required(),
-    id: Joi.string().required(),
+    todoID: Joi.string().required(),
     text: Joi.string().max(50).required(),
     userID: Joi.objectId().required(),
     updateDate: Joi.number().required(),

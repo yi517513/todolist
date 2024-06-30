@@ -12,7 +12,7 @@ const todoSchema = new Schema({
     maxlength: 50,
     required: true,
   },
-  id: {
+  todoID: {
     type: String,
     required: true,
   },

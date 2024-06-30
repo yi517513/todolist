@@ -40,7 +40,10 @@ function App() {
           todoFromDB.map((todo) => {
             // 解構出不需要的屬性
             let { date, userID, __v, _id, ...cleanTodo } = todo;
-            localStorage.setItem(`todo_${todo.id}`, JSON.stringify(cleanTodo));
+            localStorage.setItem(
+              `todo_${todo.todoID}`,
+              JSON.stringify(cleanTodo)
+            );
           });
           // console.log(todoFromDB);
 
