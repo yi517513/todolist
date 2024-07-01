@@ -7,7 +7,15 @@ import {
   toggleEditingTodo,
   saveTodo,
   updateTodo,
+  setTodo,
 } from "../slices/todoSlice";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faPlus,
+  faFolderOpen,
+  faCalendarDays,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons";
 
 const HomeComponent = () => {
   const dispatch = useDispatch();
@@ -23,10 +31,57 @@ const HomeComponent = () => {
     dispatch(newTodo());
   };
 
+  const handleFetchData = () => {
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith("todo_")) {
+        const todoString = localStorage.getItem(key);
+        try {
+          const todo = JSON.parse(todoString);
+          if (todo) {
+            dispatch(setTodo(todo));
+          } else {
+            console.error(`Invalid todo data: ${todoString}`);
+          }
+        } catch (error) {
+          console.error(`Failed to parse todo data: ${todoString}`, error);
+        }
+      }
+    });
+  };
+
   return (
     <main>
       <section>
-        <h1>Todo-List</h1>
+        <div className="top">
+          <h1>Todo-List</h1>
+          <button className="topbtn" onClick={handleFetchData}>
+            <FontAwesomeIcon icon={faFolderOpen} />
+          </button>
+          {token && (
+            <button className="topbtn">
+              <FontAwesomeIcon icon={faCalendarDays} />
+            </button>
+          )}
+          <button
+            className="topbtn"
+            onClick={(e) => {
+              e.preventDefault();
+              const result = window.confirm("是否刪除本地紀錄?");
+              if (result) {
+                try {
+                  Object.keys(localStorage)
+                    .filter((key) => key.startsWith("todo"))
+                    .forEach((key) => localStorage.removeItem(key));
+                  window.alert("刪除成功");
+                } catch (error) {
+                  console.error(error);
+                }
+              }
+            }}
+          >
+            <FontAwesomeIcon icon={faTrash} />
+          </button>
+        </div>
         {Object.values(todos).map((todo) => {
           return (
             <TodoComponent
@@ -53,7 +108,7 @@ const HomeComponent = () => {
           );
         })}
         <button className="addTodo" onClick={handleAddTodo}>
-          +
+          <FontAwesomeIcon icon={faPlus} />
         </button>
       </section>
     </main>

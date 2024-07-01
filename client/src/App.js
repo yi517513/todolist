@@ -10,58 +10,32 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "./slices/authSlice";
 import AuthService from "./services/auth.service";
-import { setTodo } from "./slices/todoSlice";
 import TodoService from "./services/todo.service";
 
 function App() {
   const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
 
-  // 啟動時，檢查localstroage是否有token，若有就被添加到redux狀態中
+  // 啟動時，執行initialize，有token(登入)就會同步資料到DB，沒token(離線)不執行同步
   useEffect(() => {
-    const fetchUser = async () => {
-      const tokenFromStorage = localStorage.getItem("token");
-      if (tokenFromStorage) {
+    const initialize = async () => {
+      const tokenFromStroage = localStorage.getItem("token");
+      if (tokenFromStroage) {
         try {
-          const user = await AuthService.getCurrentUser(tokenFromStorage);
-          dispatch(setUser({ user, token: tokenFromStorage }));
-        } catch (error) {
-          console.error("Error fetching user:", error);
-        }
-      }
-    };
-    // 使用useSelector獲取token確保token是最新的
-    // 當token發生改變時useEffect會再次執行
-    const fetchTodo = async () => {
-      if (token) {
-        try {
-          const response = await TodoService.getAllTodo(token);
-          const todoFromDB = response.data;
-          todoFromDB.map((todo) => {
-            // 解構出不需要的屬性
-            let { date, userID, __v, _id, ...cleanTodo } = todo;
-            localStorage.setItem(
-              `todo_${todo.todoID}`,
-              JSON.stringify(cleanTodo)
-            );
-          });
-          // console.log(todoFromDB);
+          const user = await AuthService.getCurrentUser(tokenFromStroage);
+          dispatch(setUser({ user, token: tokenFromStroage }));
 
-          // Object.keys適用於獲取物件中所有可枚舉屬性名的方法
-          // 在這context中Object.keys(localStorage)是為了獲取localStorage中所有存儲的key
-          Object.keys(localStorage).forEach((key) => {
-            if (key.startsWith("todo_")) {
-              const todo = JSON.parse(localStorage.getItem(key));
-              dispatch(setTodo(todo));
-            }
-          });
+          const localTodos = Object.keys(localStorage)
+            .filter((key) => key.startsWith("todo_"))
+            .map((key) => JSON.parse(localStorage.getItem(key)));
+
+          await TodoService.syncTodos(tokenFromStroage, localTodos);
         } catch (e) {
-          console.log(e);
+          console.log("Error during initialization:", e);
         }
       }
     };
-    fetchUser();
-    fetchTodo();
+    initialize();
   }, [dispatch, token]);
 
   return (

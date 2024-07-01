@@ -14,7 +14,7 @@ export const saveTodo = createAsyncThunk(
     const tempTodo = { ...state.todos[todoID], text, check, updateDate };
     localStorage.setItem(`todo_${todoID}`, JSON.stringify(tempTodo));
     if (!token && !userID)
-      return thunkAPI.rejectWithValue("No token or userID");
+      return { todoID, text, check, updateDate, isOffline: true };
 
     try {
       await TodoService.saveTodo(
@@ -41,13 +41,15 @@ export const updateTodo = createAsyncThunk(
   async ({ todoID, text, check }, thunkAPI) => {
     const state = thunkAPI.getState();
     const { token } = state.auth;
-    const { _id: userID } = state.auth.user;
+    const { _id: userID } = state.auth.user || "";
     const updateDate = gernerateTime();
 
     const tempTodo = { ...state.todos[todoID], text, check, updateDate };
     localStorage.setItem(`todo_${todoID}`, JSON.stringify(tempTodo));
-    if (!token && !userID)
-      return thunkAPI.rejectWithValue("No token or userID");
+    if (!token && !userID) {
+      console.log(3);
+      return { todoID, text, check, updateDate, isOffline: true };
+    }
 
     try {
       await TodoService.updateTodo(
@@ -85,8 +87,12 @@ const todoSlice = createSlice({
         isLocal: true,
       };
     },
-    setTodo(state, action) {
+    setTodo: (state, action) => {
       const { todoID, text, check, updateDate } = action.payload;
+      if (todoID === undefined) {
+        console.error("Invalid payload: ", action.payload);
+        return;
+      }
       state[todoID] = {
         todoID,
         text,
@@ -98,7 +104,6 @@ const todoSlice = createSlice({
     deleteTodo: (state, action) => {
       const todoID = action.payload;
       delete state[todoID];
-      localStorage.removeItem(`todo_${todoID}`);
     },
     toggleEditingTodo: (state, action) => {
       const todo = state[action.payload];
@@ -117,7 +122,7 @@ const todoSlice = createSlice({
         state[todoID].error = null;
       })
       .addCase(saveTodo.fulfilled, (state, action) => {
-        const { todoID, text, check, updateDate } = action.payload;
+        const { todoID, text, check, updateDate, isOffline } = action.payload;
         state[todoID].text = text;
         state[todoID].isEditing = false;
         state[todoID].isLoading = false;
@@ -125,6 +130,11 @@ const todoSlice = createSlice({
         state[todoID].check = check;
         state[todoID].isLocal = false;
         state[todoID].updateDate = updateDate;
+        if (isOffline) {
+          state[todoID].isLocal = true;
+        } else {
+          state[todoID].isLocal = false;
+        }
       })
       .addCase(saveTodo.rejected, (state, action) => {
         const { todoID } = action.meta.arg;
@@ -137,15 +147,21 @@ const todoSlice = createSlice({
         state[todoID].error = null;
       })
       .addCase(updateTodo.fulfilled, (state, action) => {
-        const { todoID, text, check, updateDate } = action.payload;
+        const { todoID, text, check, updateDate, isOffline } = action.payload;
         state[todoID].isEditing = false;
         state[todoID].isLoading = false;
         state[todoID].error = null;
         state[todoID].check = check;
+        console.log(check);
         state[todoID].text = text;
         state[todoID].updateDate = updateDate;
         if (check) {
           state[todoID].isEditing = null;
+        }
+        if (isOffline) {
+          state[todoID].isLocal = true;
+        } else {
+          state[todoID].isLocal = false;
         }
       })
       .addCase(updateTodo.rejected, (state, action) => {
@@ -159,3 +175,11 @@ const todoSlice = createSlice({
 export const { setTodo, newTodo, deleteTodo, toggleEditingTodo } =
   todoSlice.actions;
 export default todoSlice.reducer;
+
+// 離線同步中間件
+export const syncTodoWithServer = () => async (dispatch, getState) => {
+  const state = getState();
+  const { token } = state.auth;
+  const { _id: userID } = state.auth.user;
+  if (!token && !userID) return;
+};

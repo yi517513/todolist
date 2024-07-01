@@ -23,6 +23,19 @@ class TodoService {
   getAllTodo(token) {
     return axios.get(TODO_URL, { headers: { Authorization: token } });
   }
+  syncTodos = async (token, todos) => {
+    try {
+      const response = await axios.post(
+        TODO_URL + "/sync",
+        { todos },
+        { headers: { Authorization: token } }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Sync Error:", error);
+      throw error;
+    }
+  };
 }
 
 const todoService = new TodoService();

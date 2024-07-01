@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheck,
-  faTrashCan,
+  faMinus,
   faPenToSquare,
   faFloppyDisk,
 } from "@fortawesome/free-solid-svg-icons";
@@ -82,8 +82,10 @@ const TodoComponent = ({
           className="todo"
           onClick={(e) => {
             e.preventDefault();
-            toggleEditingTodo(todoID);
-            setIsEmptyClick(false);
+            if (!check) {
+              toggleEditingTodo(todoID);
+              setIsEmptyClick(false);
+            }
           }}
         >
           <FontAwesomeIcon icon={faPenToSquare} />
@@ -100,7 +102,7 @@ const TodoComponent = ({
               deleteTodo(todoID);
             }}
           >
-            <FontAwesomeIcon icon={faTrashCan} />
+            <FontAwesomeIcon icon={faMinus} />
           </button>
         ) : (
           <button className="todo" onClick={handleCheck}>

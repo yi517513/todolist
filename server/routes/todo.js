@@ -1,8 +1,8 @@
 const router = require("express").Router();
-const { boolean } = require("joi");
 const Todo = require("../models/todo-model");
 const newTodoValidation = require("../validation").newTodoValidation;
 const updateTodoValidation = require("../validation").updateTodoValidation;
+const { syncTodos } = require("../controllers/todo.controller");
 
 router.use("/", (req, res, next) => {
   console.log("正在接收跟todo有關的請求(Authorized)");
@@ -107,5 +107,8 @@ router.delete("/:_id", async (req, res) => {
     return res.status(500).send(e);
   }
 });
+
+// 同步todo
+router.post("/sync", syncTodos);
 
 module.exports = router;

@@ -35,17 +35,17 @@ nav {
         }
       }
     }
-    form {
-      padding: 0.5rem 1rem;
-      input {
-        font-size: 1.4rem;
-        border-radius: 1rem;
-        padding: 0.5rem 1rem;
-        margin-top: 0.25rem;
-        border: none;
-        cursor: pointer;
-      }
-    }
+    // form {
+    //   padding: 0.5rem 1rem;
+    //   input {
+    //     font-size: 1.4rem;
+    //     border-radius: 1rem;
+    //     padding: 0.5rem 1rem;
+    //     margin-top: 0.25rem;
+    //     border: none;
+    //     cursor: pointer;
+    //   }
+    // }
   }
 }
 
@@ -103,17 +103,29 @@ main {
     flex-direction: column;
     align-items: center;
     margin-top: 4rem;
-    h1 {
-      font-size: 4rem;
-      caret-color: transparent;
+    div.top {
+      display: flex;
+      h1 {
+        font-size: 3rem;
+        caret-color: transparent;
+        margin-right: 1rem;
+      }
+      button.topbtn {
+        background-color: #272727;
+        color: white;
+        border: none;
+        margin: 1rem;
+        font-size: 2rem;
+        cursor: pointer;
+        &:hover {
+          color: yellow;
+        }
+      }
     }
-
     button.addTodo {
-      background-color: white;
-      cursor: pointer;
       border: none;
       font-size: 2rem;
-      margin-top: 0.5rem;
+      margin-top: 1rem;
       width: 2.5rem;
       border-radius: 1rem;
     }

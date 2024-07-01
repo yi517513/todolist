@@ -41,9 +41,9 @@ const NavComponent1 = () => {
             </Link>
           </li>
         )}
-        <form>
+        {/* <form>
           <input placeholder=" Search" />
-        </form>
+        </form> */}
       </ul>
     </nav>
   );
