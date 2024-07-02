@@ -43,6 +43,7 @@ export const login = createAsyncThunk(
 export const verifyToken = createAsyncThunk(
   "auth/verifyToken",
   async (_, thunkAPI) => {
+    const state = thunkAPI.getState();
     const token = localStorage.getItem("token");
     if (!token) {
       return thunkAPI.rejectWithValue("No token found");
@@ -50,8 +51,12 @@ export const verifyToken = createAsyncThunk(
     try {
       const response = await AuthService.verifytoken(token);
       if (response.data.success) {
-        const userResponse = await AuthService.getCurrentUser(token);
-        return userResponse.data;
+        try {
+          await AuthService.getCurrentUser(token);
+          return state.auth.user;
+        } catch (error) {
+          return thunkAPI.rejectWithValue("Can not found User");
+        }
       }
       return response.data;
     } catch (error) {

@@ -29,7 +29,19 @@ function App() {
             .filter((key) => key.startsWith("todo_"))
             .map((key) => JSON.parse(localStorage.getItem(key)));
 
+          // 上傳到DB
           await TodoService.syncTodos(tokenFromStroage, localTodos);
+          // 下載到本地
+          const todosFromDB = await TodoService.getAllTodo(tokenFromStroage);
+          if (todosFromDB.data) {
+            todosFromDB.data.forEach((todo) => {
+              const { date, userID, __v, _id, ...cleanTodo } = todo;
+              localStorage.setItem(
+                `todo_${cleanTodo.todoID}`,
+                JSON.stringify(cleanTodo)
+              );
+            });
+          }
         } catch (e) {
           console.log("Error during initialization:", e);
         }

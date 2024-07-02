@@ -102,23 +102,42 @@ main {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 4rem;
+    margin-top: 2rem;
+    // border: 2px solid black;
     div.top {
       display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 1rem;
+      // border: 2px solid yellow;
       h1 {
         font-size: 3rem;
         caret-color: transparent;
-        margin-right: 1rem;
       }
-      button.topbtn {
-        background-color: #272727;
-        color: white;
-        border: none;
-        margin: 1rem;
-        font-size: 2rem;
-        cursor: pointer;
-        &:hover {
-          color: yellow;
+      div.btnList {
+        display: flex;
+        justify-content: center;
+        // border: 2px solid blue;
+        margin: 0.5rem;
+        button.middle-btn {
+          background-color: #272727;
+          color: white;
+          border: none;
+          margin: 1rem;
+          font-size: 2rem;
+          cursor: pointer;
+          &:hover {
+            color: yellow;
+          }
+        }
+      }
+      div.dateInput {
+        // border: 2px solid yellow;
+        margin: 0.1rem 0rem;
+        input {
+          padding: 0.5rem;
+          font-size: 1.5rem;
+          border: none;
         }
       }
     }

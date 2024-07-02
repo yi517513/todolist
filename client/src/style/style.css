@@ -94,17 +94,24 @@ main section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 4rem;
+  margin-top: 2rem;
 }
 main section div.top {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1rem;
 }
 main section div.top h1 {
   font-size: 3rem;
   caret-color: transparent;
-  margin-right: 1rem;
 }
-main section div.top button.topbtn {
+main section div.top div.btnList {
+  display: flex;
+  justify-content: center;
+  margin: 0.5rem;
+}
+main section div.top div.btnList button.middle-btn {
   background-color: #272727;
   color: white;
   border: none;
@@ -112,8 +119,16 @@ main section div.top button.topbtn {
   font-size: 2rem;
   cursor: pointer;
 }
-main section div.top button.topbtn:hover {
+main section div.top div.btnList button.middle-btn:hover {
   color: yellow;
+}
+main section div.top div.dateInput {
+  margin: 0.1rem 0rem;
+}
+main section div.top div.dateInput input {
+  padding: 0.5rem;
+  font-size: 1.5rem;
+  border: none;
 }
 main section button.addTodo {
   border: none;

@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import TodoService from "../services/todo.service";
-import { gernerateTime } from "../services/date.service";
+import DateService from "../services/date.service";
 
 // 將saveTodo改寫成createAsyncThunk
 export const saveTodo = createAsyncThunk(
@@ -9,7 +9,7 @@ export const saveTodo = createAsyncThunk(
     const state = thunkAPI.getState();
     const { token } = state.auth || "";
     const { _id: userID } = state.auth.user || "";
-    const updateDate = gernerateTime();
+    const updateDate = DateService.gernerateTime();
 
     const tempTodo = { ...state.todos[todoID], text, check, updateDate };
     localStorage.setItem(`todo_${todoID}`, JSON.stringify(tempTodo));
@@ -42,7 +42,7 @@ export const updateTodo = createAsyncThunk(
     const state = thunkAPI.getState();
     const { token } = state.auth;
     const { _id: userID } = state.auth.user || "";
-    const updateDate = gernerateTime();
+    const updateDate = DateService.gernerateTime();
 
     const tempTodo = { ...state.todos[todoID], text, check, updateDate };
     localStorage.setItem(`todo_${todoID}`, JSON.stringify(tempTodo));
@@ -75,7 +75,7 @@ const todoSlice = createSlice({
   initialState: {},
   reducers: {
     newTodo: (state) => {
-      const todoID = gernerateTime();
+      const todoID = DateService.gernerateTime();
       state[todoID] = {
         todoID,
         text: "",
@@ -88,18 +88,23 @@ const todoSlice = createSlice({
       };
     },
     setTodo: (state, action) => {
-      const { todoID, text, check, updateDate } = action.payload;
+      const { todoID, text, check, updateDate, witchDay } = action.payload;
       if (todoID === undefined) {
         console.error("Invalid payload: ", action.payload);
         return;
       }
-      state[todoID] = {
-        todoID,
-        text,
-        isEditing: false,
-        check,
-        updateDate,
-      };
+      if (String(updateDate).substring(4, 8) === witchDay) {
+        state[todoID] = {
+          todoID,
+          text,
+          isEditing: false,
+          check,
+          updateDate,
+        };
+      }
+    },
+    clearTodos: (state) => {
+      return {};
     },
     deleteTodo: (state, action) => {
       const todoID = action.payload;
@@ -172,14 +177,15 @@ const todoSlice = createSlice({
   },
 });
 
-export const { setTodo, newTodo, deleteTodo, toggleEditingTodo } =
+export const { setTodo, newTodo, deleteTodo, toggleEditingTodo, clearTodos } =
   todoSlice.actions;
 export default todoSlice.reducer;
 
 // 離線同步中間件
-export const syncTodoWithServer = () => async (dispatch, getState) => {
-  const state = getState();
-  const { token } = state.auth;
-  const { _id: userID } = state.auth.user;
-  if (!token && !userID) return;
-};
+// export const syncTodoWithServer = () => async (dispatch, getState) => {
+// console.log("using syncTodoWithServer middleware")
+//   const state = getState();
+//   const { token } = state.auth;
+//   const { _id: userID } = state.auth.user;
+//   if (!token && !userID) return;
+// };

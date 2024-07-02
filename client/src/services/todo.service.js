@@ -23,6 +23,7 @@ class TodoService {
   getAllTodo(token) {
     return axios.get(TODO_URL, { headers: { Authorization: token } });
   }
+  // 本地上傳到DB
   syncTodos = async (token, todos) => {
     try {
       const response = await axios.post(
@@ -36,6 +37,7 @@ class TodoService {
       throw error;
     }
   };
+  // 選取特定日期的資料
 }
 
 const todoService = new TodoService();
