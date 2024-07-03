@@ -20,22 +20,10 @@ router.get("/", async (req, res) => {
 });
 
 // 查詢特定id待辦事項
-router.get("/:_id", async (req, res) => {
-  let { _id } = req.params;
+router.get("/:id", async (req, res) => {
+  let { id } = req.params;
   try {
-    let foundTodo = await Todo.findOne({ id: _id }).exec();
-    return res.send(foundTodo);
-  } catch (e) {
-    return res.status(400).send(e);
-  }
-});
-
-// 查詢成功or失敗待辦事項
-router.get("/check/:check", async (req, res) => {
-  let { check } = req.params;
-  check = check === true || check === "true";
-  try {
-    let foundTodo = await Todo.find({ check }).exec();
+    let foundTodo = await Todo.findOne({ id }).exec();
     return res.send(foundTodo);
   } catch (e) {
     return res.status(400).send(e);
@@ -44,7 +32,7 @@ router.get("/check/:check", async (req, res) => {
 
 // 新增待辦事項
 router.post("/", async (req, res) => {
-  let { text, todoID, check, userID, updateDate } = req.body;
+  let { text, todoID, check, userID, updatedAt } = req.body;
   check = check === "true" || check === true;
 
   // Joi驗證
@@ -53,12 +41,12 @@ router.post("/", async (req, res) => {
     todoID,
     check,
     userID,
-    updateDate,
+    updatedAt,
   });
   if (error) return res.status(400).send(error.details);
   // 新增資料
   try {
-    let newTodo = new Todo({ text, todoID, check, userID, updateDate });
+    let newTodo = new Todo({ text, todoID, check, userID, updatedAt });
     await newTodo.save();
     return res.send("成功新增資料!");
   } catch (e) {
@@ -68,7 +56,7 @@ router.post("/", async (req, res) => {
 
 // 更新待辦事項
 router.patch("/:todoID", async (req, res) => {
-  let { text, todoID, check, userID, updateDate } = req.body;
+  let { text, todoID, check, userID, updatedAt } = req.body;
   check = check === "true" || check === true;
 
   // Joi驗證
@@ -77,7 +65,7 @@ router.patch("/:todoID", async (req, res) => {
     todoID,
     check,
     userID,
-    updateDate,
+    updatedAt,
   });
   if (error) return res.status(400).send(error.details);
 
@@ -85,7 +73,7 @@ router.patch("/:todoID", async (req, res) => {
   try {
     let updatedTodo = await Todo.findOneAndUpdate(
       { todoID: req.params.todoID },
-      { text, check, userID, updateDate },
+      { text, check, userID, updatedAt },
       { new: true }
     );
     if (!updatedTodo) {
@@ -98,17 +86,17 @@ router.patch("/:todoID", async (req, res) => {
 });
 
 // 刪除待辦事項
-router.delete("/:_id", async (req, res) => {
-  let { _id } = req.params;
+router.delete("/:id", async (req, res) => {
+  let { id } = req.params;
   try {
-    await Todo.findByIdAndDelete({ _id }).exec();
+    await Todo.findByIdAndDelete({ id }).exec();
     return res.send("成功刪除事項!");
   } catch (e) {
     return res.status(500).send(e);
   }
 });
 
-// 同步todo
+// 同步待辦事項
 router.post("/sync", syncTodos);
 
 module.exports = router;

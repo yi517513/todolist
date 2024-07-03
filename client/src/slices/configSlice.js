@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import DateService from "../services/date.service";
 
 const configSlice = createSlice({
   name: "config",
@@ -9,11 +8,13 @@ const configSlice = createSlice({
       state.open = !state.open;
     },
     changeDay: (state, action) => {
-      const day = action.payload;
-      state.day += Number(day);
+      state.day += action.payload;
+    },
+    selectDay: (state, action) => {
+      state.day = action.payload;
     },
   },
 });
 
-export const { setOpen, changeDay } = configSlice.actions;
+export const { setOpen, changeDay, selectDay } = configSlice.actions;
 export default configSlice.reducer;

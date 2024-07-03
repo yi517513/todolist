@@ -6,46 +6,58 @@ import {
   faPenToSquare,
   faFloppyDisk,
 } from "@fortawesome/free-solid-svg-icons";
-
-const TodoComponent = ({
-  todo,
-  deleteTodo,
-  toggleEditingTodo,
+import {
   saveTodo,
   updateTodo,
-}) => {
-  const [text, setText] = useState(todo.text);
-  const [isUpdate, setIsUpdate] = useState(false);
-  const { todoID, isEditing, check, isLocal } = todo;
-  const [isEmptyClick, setIsEmptyClick] = useState(false);
+  removeTodo,
+  toggleEditingTodo,
+} from "../slices/todoSlice";
+import { useDispatch } from "react-redux";
 
-  const handleSave = (e) => {
+const TodoComponent = ({ todo }) => {
+  const dispatch = useDispatch();
+  const [isSaving, setIsSaving] = useState(false);
+  const [isEmptyInput, setIsEmptyInput] = useState(false);
+  const { todoID, isEditing, check } = todo;
+  const [text, setText] = useState(todo.text);
+  // console.log(todoID);
+
+  const handleSaveClick = (e) => {
     e.preventDefault();
     // 阻擋不合理的請求
     if (!text) {
-      setIsEmptyClick(true);
+      setIsEmptyInput(true);
       return;
     }
-    if (isLocal && !isUpdate) {
-      saveTodo(todoID, text, false);
-      setIsUpdate(true);
-    } else if (isLocal && isUpdate) {
-      // console.log("handleSave");
-      updateTodo(todoID, text, false);
+    if (!isSaving) {
+      dispatch(saveTodo({ todoID, text, check: false }));
+      setIsSaving(true);
     } else {
-      // console.log("handleSave");
-      updateTodo(todoID, text, false);
+      dispatch(updateTodo({ todoID, text, check: false }));
     }
   };
 
-  const handleCheck = (e) => {
+  const handleCheckClick = (e) => {
     e.preventDefault();
-
     if (!text) {
-      setIsEmptyClick(true);
+      setIsEmptyInput(true);
       return;
     }
-    updateTodo(todoID, text, true);
+    dispatch(updateTodo({ todoID, text, check: true }));
+  };
+
+  const handleEditClick = (e) => {
+    e.preventDefault();
+    if (!check) {
+      dispatch(toggleEditingTodo(todoID));
+      setIsEmptyInput(false);
+    }
+  };
+
+  const handleRemoveClick = (e) => {
+    console.log("remove" + todoID);
+    e.preventDefault();
+    dispatch(removeTodo(todoID));
   };
 
   return (
@@ -57,7 +69,7 @@ const TodoComponent = ({
         input&!isEditing = blue  */}
         <input
           className={
-            isEmptyClick
+            isEmptyInput
               ? "shake"
               : check
               ? "check"
@@ -66,46 +78,27 @@ const TodoComponent = ({
               : ""
           }
           value={text}
-          onChange={(e) => {
-            e.preventDefault();
-            setText(e.target.value);
-          }}
+          onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
-              handleSave(e);
+              handleSaveClick(e);
             }
           }}
-          readOnly={!isEditing}
         />
-        <button
-          className="todo"
-          onClick={(e) => {
-            e.preventDefault();
-            if (!check) {
-              toggleEditingTodo(todoID);
-              setIsEmptyClick(false);
-            }
-          }}
-        >
+        <button className="todo" onClick={handleEditClick}>
           <FontAwesomeIcon icon={faPenToSquare} />
         </button>
         {isEditing ? (
-          <button className="todo" onClick={handleSave}>
+          <button className="todo" onClick={handleSaveClick}>
             <FontAwesomeIcon icon={faFloppyDisk} />
           </button>
         ) : check ? (
-          <button
-            className="todo"
-            onClick={(e) => {
-              e.preventDefault();
-              deleteTodo(todoID);
-            }}
-          >
+          <button className="todo" onClick={handleRemoveClick}>
             <FontAwesomeIcon icon={faMinus} />
           </button>
         ) : (
-          <button className="todo" onClick={handleCheck}>
+          <button className="todo" onClick={handleCheckClick}>
             <FontAwesomeIcon icon={faCheck} />
           </button>
         )}

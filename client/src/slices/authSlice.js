@@ -4,7 +4,7 @@ import AuthService from "../services/auth.service";
 // const token = localStorage.getItem("token");
 // 定義初始狀態
 const initialState = {
-  user: null,
+  user: {},
   isLoading: false,
   isAuthenticated: false,
   error: null,
@@ -50,6 +50,7 @@ export const verifyToken = createAsyncThunk(
     }
     try {
       const response = await AuthService.verifytoken(token);
+      console.log(response.data);
       if (response.data.success) {
         try {
           await AuthService.getCurrentUser(token);
