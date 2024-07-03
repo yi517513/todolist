@@ -6,26 +6,19 @@ import DateService from "../services/date.service";
 export const saveTodo = createAsyncThunk(
   "todo/save",
   async ({ todoID, text, check }, thunkAPI) => {
+    console.log(todoID);
     const state = thunkAPI.getState();
     const { token } = state.auth || "";
     const { _id: userID } = state.auth.user || "";
-    const updateDate = DateService.gernerateTime();
+    const updatedAt = DateService.gernerateTime();
 
-    const tempTodo = { ...state.todos[todoID], text, check, updateDate };
-    localStorage.setItem(`todo_${todoID}`, JSON.stringify(tempTodo));
-    if (!token && !userID)
-      return { todoID, text, check, updateDate, isOffline: true };
+    const updateTodo = { ...state.todos[todoID], text, check, updatedAt };
+    updateLocalStorage(todoID, updateTodo);
+    if (!token && !userID) return { todoID, text, check, updatedAt };
 
     try {
-      await TodoService.saveTodo(
-        text,
-        check,
-        userID,
-        todoID,
-        token,
-        updateDate
-      );
-      return { todoID, text, check, updateDate };
+      await TodoService.saveTodo(text, check, userID, todoID, token, updatedAt);
+      return { todoID, text, check, updatedAt };
     } catch (error) {
       //error.response.data-如果error.response不存在，則會拋出TypeError
       //error.response?.data-使用可選鏈運算符，如果error.response不存在，返回undefined
@@ -35,20 +28,20 @@ export const saveTodo = createAsyncThunk(
     }
   }
 );
-// edit createAsyncThunk
+// edit AsyncThunk
 export const updateTodo = createAsyncThunk(
   "todo/update",
   async ({ todoID, text, check }, thunkAPI) => {
     const state = thunkAPI.getState();
     const { token } = state.auth;
     const { _id: userID } = state.auth.user || "";
-    const updateDate = DateService.gernerateTime();
+    const updatedAt = DateService.gernerateTime();
 
-    const tempTodo = { ...state.todos[todoID], text, check, updateDate };
-    localStorage.setItem(`todo_${todoID}`, JSON.stringify(tempTodo));
+    const updatedTodo = { ...state.todos[todoID], text, check, updatedAt };
+    updateLocalStorage(todoID, updatedTodo);
     if (!token && !userID) {
       console.log(3);
-      return { todoID, text, check, updateDate, isOffline: true };
+      return { todoID, text, check, updatedAt };
     }
 
     try {
@@ -58,9 +51,9 @@ export const updateTodo = createAsyncThunk(
         userID,
         todoID,
         token,
-        updateDate
+        updatedAt
       );
-      return { todoID, text, check, updateDate };
+      return { todoID, text, check, updatedAt };
     } catch (error) {
       const errorMessage = error.response?.data || error.message;
       return thunkAPI.rejectWithValue(errorMessage);
@@ -68,12 +61,15 @@ export const updateTodo = createAsyncThunk(
   }
 );
 
-// delete createAsyncThunk
+const updateLocalStorage = (todoID, todo) => {
+  localStorage.setItem(`todo_${todoID}`, JSON.stringify(todo));
+};
 
 const todoSlice = createSlice({
   name: "todos",
   initialState: {},
   reducers: {
+    // 新增todo component
     newTodo: (state) => {
       const todoID = DateService.gernerateTime();
       state[todoID] = {
@@ -83,38 +79,37 @@ const todoSlice = createSlice({
         check: false,
         isLoading: false,
         error: null,
-        updateDate: null,
-        isLocal: true,
+        updatedAt: null,
       };
     },
-    setTodo: (state, action) => {
-      const { todoID, text, check, updateDate, witchDay } = action.payload;
+    setTodoItem: (state, action) => {
+      const { todoID, text, check, updatedAt, witchDay } = action.payload;
       if (todoID === undefined) {
         console.error("Invalid payload: ", action.payload);
         return;
       }
-      if (String(updateDate).substring(4, 8) === witchDay) {
+      if (updatedAt.substring(4, 8) === witchDay) {
         state[todoID] = {
           todoID,
           text,
           isEditing: false,
           check,
-          updateDate,
+          updatedAt,
         };
       }
     },
-    clearTodos: (state) => {
+    // 清除state中的todos
+    clearAllTodos: (state) => {
       return {};
     },
-    deleteTodo: (state, action) => {
+    removeTodo: (state, action) => {
       const todoID = action.payload;
       delete state[todoID];
     },
     toggleEditingTodo: (state, action) => {
-      const todo = state[action.payload];
-      if (todo) {
-        todo.isEditing = true;
-      }
+      const todoID = action.payload;
+      const todo = state[todoID];
+      todo.isEditing = true;
     },
   },
   extraReducers: (builder) => {
@@ -127,22 +122,18 @@ const todoSlice = createSlice({
         state[todoID].error = null;
       })
       .addCase(saveTodo.fulfilled, (state, action) => {
-        const { todoID, text, check, updateDate, isOffline } = action.payload;
+        const { todoID, text, check, updatedAt } = action.payload;
         state[todoID].text = text;
         state[todoID].isEditing = false;
         state[todoID].isLoading = false;
         state[todoID].error = null;
         state[todoID].check = check;
         state[todoID].isLocal = false;
-        state[todoID].updateDate = updateDate;
-        if (isOffline) {
-          state[todoID].isLocal = true;
-        } else {
-          state[todoID].isLocal = false;
-        }
+        state[todoID].updatedAt = updatedAt;
       })
       .addCase(saveTodo.rejected, (state, action) => {
         const { todoID } = action.meta.arg;
+        console.log(todoID);
         state[todoID].isLoading = false;
         state[todoID].error = action.payload;
       })
@@ -152,22 +143,13 @@ const todoSlice = createSlice({
         state[todoID].error = null;
       })
       .addCase(updateTodo.fulfilled, (state, action) => {
-        const { todoID, text, check, updateDate, isOffline } = action.payload;
+        const { todoID, text, check, updatedAt } = action.payload;
         state[todoID].isEditing = false;
         state[todoID].isLoading = false;
         state[todoID].error = null;
         state[todoID].check = check;
-        console.log(check);
         state[todoID].text = text;
-        state[todoID].updateDate = updateDate;
-        if (check) {
-          state[todoID].isEditing = null;
-        }
-        if (isOffline) {
-          state[todoID].isLocal = true;
-        } else {
-          state[todoID].isLocal = false;
-        }
+        state[todoID].updatedAt = updatedAt;
       })
       .addCase(updateTodo.rejected, (state, action) => {
         const { todoID } = action.meta.arg;
@@ -177,15 +159,11 @@ const todoSlice = createSlice({
   },
 });
 
-export const { setTodo, newTodo, deleteTodo, toggleEditingTodo, clearTodos } =
-  todoSlice.actions;
+export const {
+  setTodoItem,
+  newTodo,
+  removeTodo,
+  toggleEditingTodo,
+  clearAllTodos,
+} = todoSlice.actions;
 export default todoSlice.reducer;
-
-// 離線同步中間件
-// export const syncTodoWithServer = () => async (dispatch, getState) => {
-// console.log("using syncTodoWithServer middleware")
-//   const state = getState();
-//   const { token } = state.auth;
-//   const { _id: userID } = state.auth.user;
-//   if (!token && !userID) return;
-// };

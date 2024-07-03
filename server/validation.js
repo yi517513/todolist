@@ -24,7 +24,7 @@ const newTodoValidation = (data) => {
     todoID: Joi.string().required(),
     text: Joi.string().max(50).required(),
     userID: Joi.objectId().required(),
-    updateDate: Joi.number().required(),
+    updatedAt: Joi.string().required(),
   });
   return Schema.validate(data);
 };
@@ -35,7 +35,7 @@ const updateTodoValidation = (data) => {
     todoID: Joi.string().required(),
     text: Joi.string().max(50).required(),
     userID: Joi.objectId().required(),
-    updateDate: Joi.number().required(),
+    updatedAt: Joi.string().required(),
   });
   return Schema.validate(data);
 };

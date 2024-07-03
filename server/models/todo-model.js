@@ -21,7 +21,10 @@ const todoSchema = new Schema({
     ref: "User",
     required: true,
   },
-  updateDate: { type: Number, required: true },
+  updatedAt: {
+    type: String,
+    required: true,
+  },
   date: {
     type: String,
     default: () => moment().tz("Asia/Taipei").format("YYYY-MM-DD"),

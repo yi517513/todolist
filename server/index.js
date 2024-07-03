@@ -4,9 +4,9 @@ const app = express();
 const mongoose = require("mongoose");
 const authRoute = require("./routes/auth");
 const todoRoute = require("./routes/todo");
+const profileRoute = require("./routes/profile");
 const passport = require("passport");
 require("./config/passport")(passport);
-const searchRoute = require("./routes/search");
 const cors = require("cors");
 
 mongoose
@@ -33,9 +33,9 @@ app.use(
 );
 
 app.use(
-  "/api/search",
+  "/api/profile",
   passport.authenticate("jwt", { session: false }),
-  searchRoute
+  profileRoute
 );
 
 app.listen(8080, () => {
