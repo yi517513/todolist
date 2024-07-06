@@ -41,8 +41,7 @@ test("從狀態B轉換到狀態A, 或轉換到狀態C(class為complete,remove顯
     </Provider>
   );
 
-  // 轉換到狀態B
-  // fireEvent.click(screen.getByText(/restrict/i));
+  // 轉換到狀態B - 上一個test已經保留在狀態B了
   const inputElement = container.querySelector("input");
 
   // 限制狀態(狀態B)
