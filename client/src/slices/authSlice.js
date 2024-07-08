@@ -40,32 +40,6 @@ export const login = createAsyncThunk(
   }
 );
 
-export const verifyToken = createAsyncThunk(
-  "auth/verifyToken",
-  async (_, thunkAPI) => {
-    const state = thunkAPI.getState();
-    const token = localStorage.getItem("token");
-    if (!token) {
-      return thunkAPI.rejectWithValue("No token found");
-    }
-    try {
-      const response = await AuthService.verifytoken(token);
-      console.log(response.data);
-      if (response.data.success) {
-        try {
-          await AuthService.getCurrentUser(token);
-          return state.auth.user;
-        } catch (error) {
-          return thunkAPI.rejectWithValue("Can not found User");
-        }
-      }
-      return response.data;
-    } catch (error) {
-      return thunkAPI.rejectWithValue("Invalid token");
-    }
-  }
-);
-
 // 創建 slice
 // 在extraReducers中處理createAsyncThunk生成的action types，以管理異步操作的不同狀態（pending, fulfilled, rejected）
 const authSlice = createSlice({
@@ -112,22 +86,6 @@ const authSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
-      })
-      .addCase(verifyToken.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(verifyToken.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.user = action.payload;
-        state.isAuthenticated = true;
-      })
-      .addCase(verifyToken.rejected, (state, action) => {
-        state.isLoading = false;
-        state.isAuthenticated = false;
-        state.error = action.payload;
-        state.token = null;
-        localStorage.removeItem("token");
       });
   },
 });

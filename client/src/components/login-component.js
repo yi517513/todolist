@@ -43,12 +43,18 @@ const LoginComponent = () => {
         </div>
       )}
       <div className="input-group">
-        <label>Email :</label>
-        <input name="email" value={account.email} onChange={handleEmail} />
+        <label htmlFor="email">Email :</label>
+        <input
+          id="email"
+          name="email"
+          value={account.email}
+          onChange={handleEmail}
+        />
       </div>
       <div className="input-group">
-        <label>Password :</label>
+        <label htmlFor="password">Password :</label>
         <input
+          id="password"
           name="password"
           value={account.password}
           onChange={handlePassword}
