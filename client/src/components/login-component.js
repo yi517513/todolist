@@ -32,7 +32,7 @@ const LoginComponent = () => {
         setError(resultAction.payload);
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
   return (
