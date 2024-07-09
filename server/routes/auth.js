@@ -26,37 +26,36 @@ router.post("/register", async (req, res) => {
   let newUser = new User({ username, email, password });
   try {
     let savedUser = await newUser.save();
-    return res.send({ message: "成功新增用戶!", savedUser });
-  } catch (e) {
-    return res.status(400).send(e);
+    return res.status(200).send({ message: "成功新增用戶!", savedUser });
+  } catch (error) {
+    return res.status(500).send({ message: "伺服器錯誤" });
   }
 });
 
 // 登入用戶
 router.post("/login", async (req, res) => {
-  let { username, email, password } = req.body;
-  // 使用Joi套件，在存取資料庫前進行資料驗證
-  let { error, value } = loginValidation({ email, password });
-  if (error) return res.status(400).send(error.details[0].message);
+  try {
+    let { username, email, password } = req.body;
+    // 使用Joi套件，在存取資料庫前進行資料驗證
+    let { error, value } = loginValidation({ email, password });
+    if (error) return res.status(400).send(error.details[0].message);
 
-  // 確認信箱是否正確
-  const foundUser = await User.findOne({ email }).exec();
-  if (!foundUser) {
-    return res.status(401).send("無法找到使用者，請確認信箱是否正確。");
-  }
+    // 確認信箱是否正確
+    const foundUser = await User.findOne({ email }).exec();
+    if (!foundUser) {
+      return res.status(401).send("無法找到使用者，請確認信箱是否正確。");
+    }
 
-  // 使用methods.comparePassword() 驗證密碼
-  let isMatch = await foundUser.comparePassword(password);
-  if (!isMatch) return res.status(400).send(isMatch);
-  if (isMatch) {
+    // 使用methods.comparePassword() 驗證密碼
+    let isMatch = await foundUser.comparePassword(password);
+    if (!isMatch) return res.status(401).send({ message: "密碼錯誤" });
+
     // 與DB中的密碼相符，驗證成功，製作JWT
     const payload = { _id: foundUser._id, email: foundUser.email };
-    const token = jwt.sign(payload, process.env.SECRET);
-    return res.send({
-      token: "Bearer " + token,
-    });
-  } else {
-    return res.status(401).send("密碼錯誤");
+    const token = jwt.sign(payload, process.env.SECRET, { expiresIn: "1h" });
+    return res.status(200).send({ token: "Bearer " + token });
+  } catch (error) {
+    return res.status(500).send({ message: "伺服器錯誤" });
   }
 });
 
