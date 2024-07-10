@@ -1,14 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import AuthService from "../services/auth.service";
 
-// const token = localStorage.getItem("token");
+const tokenFromStorage = localStorage.getItem("token");
 // 定義初始狀態
 const initialState = {
   user: {},
   isLoading: false,
-  isAuthenticated: false,
+  isAuthenticated: !!tokenFromStorage,
   error: null,
-  token: localStorage.getItem("token") || null,
+  token: tokenFromStorage,
 };
 
 // 定義非同步操作

@@ -1,11 +1,11 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import LoginComponent from "../components/login-component";
+import LoginComponent from "../../components/login-component";
 import { Provider } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
 import configureMockStore from "redux-mock-store";
 import { thunk } from "redux-thunk";
-import { login } from "../slices/authSlice";
+import { login } from "../../slices/authSlice";
 
 const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
