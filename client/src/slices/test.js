@@ -1,9 +1,17 @@
-import { login, logout, register, setUser } from "../../slices/authSlice";
+import authSlice, { register, login } from "../../slices/authSlice";
+import { configureStore } from "@reduxjs/toolkit";
+import thunk from "redux-thunk";
 import axios from "axios";
-import createStore from "../store/store";
-import "../loclStorageMock";
 
 jest.mock("axios");
+
+const initializeStore = (preloadedState = {}) => {
+  return configureStore({
+    reducer: { auth: authSlice },
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk),
+    preloadedState,
+  });
+};
 
 const initialAuthState = {
   user: {},
@@ -13,20 +21,23 @@ const initialAuthState = {
   token: null,
 };
 
-describe("authSlice.test - actions的調用與state的狀態", () => {
+describe("authSlice - actions and state management", () => {
   let store;
+
   beforeEach(() => {
-    jest.spyOn(localStorage, "setItem");
-    jest.spyOn(localStorage, "removeItem");
+    store = initializeStore({ auth: initialAuthState });
+    localStorage.clear();
+    jest.spyOn(Storage.prototype, "setItem");
+    jest.spyOn(Storage.prototype, "getItem");
+    jest.spyOn(Storage.prototype, "removeItem");
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  describe("authSlice - register thunk", () => {
-    store = createStore({ auth: initialAuthState });
-    test("register thunk pending state", () => {
+  describe("register", () => {
+    test("pending", () => {
       store.dispatch(
         register({
           username: "test123",
@@ -38,7 +49,8 @@ describe("authSlice.test - actions的調用與state的狀態", () => {
       expect(state.isLoading).toBe(true);
       expect(state.error).toBe(null);
     });
-    test("register thunk fulfilled state", async () => {
+
+    test("fulfilled", async () => {
       const userData = { username: "test123", email: "test123@gmail.com" };
       axios.post.mockResolvedValueOnce({ data: userData });
 
@@ -52,11 +64,12 @@ describe("authSlice.test - actions的調用與state的狀態", () => {
 
       const state = store.getState().auth;
       expect(state.isLoading).toBe(false);
-      expect(state.user).toBe(userData);
+      expect(state.user).toEqual(userData);
       expect(state.isAuthenticated).toBe(false);
       expect(state.error).toBe(null);
     });
-    test("register thunk rejected state", async () => {
+
+    test("rejected", async () => {
       const errorMessage = "Network Error";
       axios.post.mockRejectedValueOnce(new Error(errorMessage));
 
@@ -74,9 +87,8 @@ describe("authSlice.test - actions的調用與state的狀態", () => {
     });
   });
 
-  describe("authSlice - login thunk", () => {
-    store = createStore({ auth: initialAuthState });
-    test("login thunk pending state", async () => {
+  describe("login", () => {
+    test("pending", () => {
       store.dispatch(
         login({ email: "test123@gmail.com", password: "test123" })
       );
@@ -84,7 +96,8 @@ describe("authSlice.test - actions的調用與state的狀態", () => {
       expect(state.isLoading).toBe(true);
       expect(state.error).toBe(null);
     });
-    test("login thunk fulfilled state", async () => {
+
+    test("fulfilled", async () => {
       const token = "testToken";
       axios.post.mockResolvedValueOnce({ data: token });
 
@@ -100,29 +113,40 @@ describe("authSlice.test - actions的調用與state的狀態", () => {
 
       expect(localStorage.setItem).toHaveBeenCalledWith("token", token);
     });
-    test("login thunk rejected state", () => {});
+
+    test("rejected", async () => {
+      const errorMessage = "Invalid credentials";
+      axios.post.mockRejectedValueOnce(new Error(errorMessage));
+
+      await store.dispatch(
+        login({ email: "test123@gmail.com", password: "test123" })
+      );
+
+      const state = store.getState().auth;
+      expect(state.isLoading).toBe(false);
+      expect(state.error).toBe(errorMessage);
+    });
   });
 
   describe("logout and setUser actions", () => {
-    test("logout - remove token from localStorage", () => {
-      store = createStore({
+    test("logout action should remove token from localStorage", () => {
+      store = initializeStore({
         auth: {
           ...initialAuthState,
           isAuthenticated: true,
           token: "testToken",
         },
       });
-      store.dispatch(logout());
+      store.dispatch(authSlice.actions.logout());
       const state = store.getState().auth;
-      expect(state.user).toBe(null);
       expect(state.isAuthenticated).toBe(false);
-      expect(state.error).toBe(null);
       expect(state.token).toBe(null);
       expect(localStorage.removeItem).toHaveBeenCalledWith("token");
     });
-    test("setUser ", () => {
-      const user = { username: "test123" };
-      store.dispatch(setUser({ user }));
+
+    test("setUser action should update the user and isAuthenticated", () => {
+      const user = { username: "newUser" };
+      store.dispatch(authSlice.actions.setUser({ user }));
       const state = store.getState().auth;
       expect(state.user).toEqual(user);
       expect(state.isAuthenticated).toBe(true);

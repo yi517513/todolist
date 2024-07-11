@@ -1,14 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import AuthService from "../services/auth.service";
 
-const tokenFromStorage = localStorage.getItem("token");
 // 定義初始狀態
 const initialState = {
   user: {},
   isLoading: false,
-  isAuthenticated: !!tokenFromStorage,
+  isAuthenticated: false,
   error: null,
-  token: tokenFromStorage,
+  token: null,
 };
 
 // 定義非同步操作
@@ -20,8 +19,10 @@ export const register = createAsyncThunk(
       const response = await AuthService.register(username, email, password);
       return response.data;
     } catch (error) {
+      // console.log(error);
       // 如果出錯，使用 thunkAPI.rejectWithValue 返回錯誤信息作為 action payload
       const errorMessage = error.response?.data || error.message;
+      // console.log(errorMessage);
       return thunkAPI.rejectWithValue(errorMessage);
     }
   }
